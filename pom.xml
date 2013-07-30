@@ -29,6 +29,7 @@
 
         <!--Dependency versions-->
         <when.java.version>1.0.0</when.java.version>
+        <vertx.mod.hk2.version>1.0.0-final</vertx.mod.hk2.version>
         <java.inject.version>1</java.inject.version>
         <vertx.version>2.0.0-final</vertx.version>
         <vertx.testtools.version>2.0.0-final</vertx.testtools.version>
@@ -54,6 +55,12 @@
             <artifactId>when.java-testtools</artifactId>
             <version>${when.java.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.englishtown</groupId>
+            <artifactId>vertx-mod-hk2</artifactId>
+            <version>${vertx.mod.hk2.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!--Vertx provided dependencies-->
