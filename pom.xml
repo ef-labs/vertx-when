@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>vertx-mod-when</artifactId>
@@ -13,7 +11,7 @@
     </parent>
 
     <packaging>jar</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-final</version>
 
     <description>Provides when.java wrappers for standard vert.x objects to return promises.</description>
     <inceptionYear>2013</inceptionYear>
@@ -29,6 +27,7 @@
 
         <!--Dependency versions-->
         <when.java.version>1.0.0</when.java.version>
+        <vertx.mod.hk2.version>1.0.0-final</vertx.mod.hk2.version>
         <java.inject.version>1</java.inject.version>
         <vertx.version>2.0.0-final</vertx.version>
         <vertx.testtools.version>2.0.0-final</vertx.testtools.version>
@@ -54,6 +53,12 @@
             <artifactId>when.java-testtools</artifactId>
             <version>${when.java.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.englishtown</groupId>
+            <artifactId>vertx-mod-hk2</artifactId>
+            <version>${vertx.mod.hk2.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!--Vertx provided dependencies-->
@@ -190,7 +195,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <appendAssemblyId>false</appendAssemblyId>
                     <descriptors>
                         <descriptor>src/main/assembly/mod.xml</descriptor>
                     </descriptors>
@@ -239,7 +243,7 @@
     <scm>
         <connection>scm:git:ssh://git@github.com/englishtown/${project.artifactId}.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/englishtown/${project.artifactId}.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>1.0.0-final</tag>
         <url>https://github.com/englishtown/${project.artifactId}</url>
     </scm>
 
