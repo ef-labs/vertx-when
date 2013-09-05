@@ -36,7 +36,7 @@ whenContainer.deployVerticle("com.englishtown.vertx.TestVerticle")
 List<Promise<String, Void>> promises = new ArrayList<>();
 When<String, Void> when = new When<>();
 
-promises.add(whenContainer.deployModule("com.englishtown~vertx-mod-hk2~1.3.0-final"));
+promises.add(whenContainer.deployModule("com.englishtown~vertx-mod-hk2~1.5.0-SNAPSHOT"));
 promises.add(whenContainer.deployModule("com.englishtown~vertx-mod-jersey~2.1.0-final"));
 
 when.all(promises,
