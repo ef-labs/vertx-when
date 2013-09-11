@@ -15,9 +15,10 @@ import java.net.URL;
 import java.util.Map;
 
 /**
- * Default implementation of {@link com.englishtown.vertx.promises.WhenPlatformManager}
+ * Default implementation of {@link WhenPlatformManager}
  */
 public class DefaultWhenPlatformManager implements WhenPlatformManager {
+
 	private final PlatformManager manager;
 	private final When<String, Void> when = new When<>();
 

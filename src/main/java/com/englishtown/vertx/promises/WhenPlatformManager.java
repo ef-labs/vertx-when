@@ -8,9 +8,7 @@ import java.net.URL;
 import java.util.Map;
 
 /**
- * <p>Represents the Vert.x platform.</p>
- * <p>It's the role of a PlatformManager to deploy and undeploy modules and verticles. It's also used to install modules, and for various other tasks.</p>
- * <p>The Platform Manager basically represents the Vert.x container in which verticles and modules run.</p>
+ * When.java wrapper over a vert.x {@link org.vertx.java.platform.PlatformManager}
  */
 public interface WhenPlatformManager {
 
