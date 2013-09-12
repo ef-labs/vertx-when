@@ -1,9 +1,11 @@
 package com.englishtown.vertx.hk2;
 
+import com.englishtown.vertx.promises.WhenPlatformManager;
 import com.englishtown.vertx.promises.WhenContainer;
 import com.englishtown.vertx.promises.WhenEventBus;
 import com.englishtown.vertx.promises.WhenHttpClient;
 import com.englishtown.vertx.promises.WhenHttpClientResponse;
+import com.englishtown.vertx.promises.impl.DefaultWhenPlatformManager;
 import com.englishtown.vertx.promises.impl.DefaultWhenContainer;
 import com.englishtown.vertx.promises.impl.DefaultWhenEventBus;
 import com.englishtown.vertx.promises.impl.DefaultWhenHttpClient;
@@ -21,6 +23,7 @@ public class WhenBinder extends AbstractBinder {
     @Override
     protected void configure() {
 
+        bind(DefaultWhenPlatformManager.class).to(WhenPlatformManager.class);
         bind(DefaultWhenContainer.class).to(WhenContainer.class);
         bind(DefaultWhenEventBus.class).to(WhenEventBus.class);
         bind(DefaultWhenHttpClient.class).to(WhenHttpClient.class);
