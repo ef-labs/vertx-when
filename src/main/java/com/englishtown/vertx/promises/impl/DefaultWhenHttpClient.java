@@ -10,8 +10,6 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpClient;
 import org.vertx.java.core.http.HttpClientRequest;
 import org.vertx.java.core.http.HttpClientResponse;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.platform.Container;
 
 import javax.inject.Inject;
 import java.net.URI;
@@ -155,9 +153,14 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
     }
 
     protected String getPath(URI url) {
-        String s = url.toString();
-        int index = s.indexOf(url.getHost()) + url.getHost().length();
-        return s.substring(index);
+        final StringBuilder path = new StringBuilder();
+        path.append(url.getPath());
+        if (url.getQuery() != null && url.getQuery().length() > 0) {
+            path.append("?");
+            path.append(url.getQuery());
+        }
+
+        return path.toString();
     }
 
     protected void reject(Deferred<HttpClientResponse, Void> d, Throwable t) {
