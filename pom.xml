@@ -11,7 +11,7 @@
     </parent>
 
     <packaging>jar</packaging>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.1.1-final</version>
 
     <description>Provides when.java wrappers for standard vert.x objects to return promises.</description>
     <inceptionYear>2013</inceptionYear>
@@ -79,7 +79,7 @@
     <scm>
         <connection>scm:git:ssh://git@github.com/englishtown/${project.artifactId}.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/englishtown/${project.artifactId}.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>1.1.1-final</tag>
         <url>https://github.com/englishtown/${project.artifactId}</url>
     </scm>
 
