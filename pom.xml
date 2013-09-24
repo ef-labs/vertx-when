@@ -11,7 +11,7 @@
     </parent>
 
     <packaging>jar</packaging>
-    <version>1.1.2-final</version>
+    <version>1.2.0-SNAPSHOT</version>
 
     <description>Provides when.java wrappers for standard vert.x objects to return promises.</description>
     <inceptionYear>2013</inceptionYear>
@@ -19,7 +19,7 @@
     <properties>
         <!--Dependency versions-->
         <when.java.version>1.0.0</when.java.version>
-        <vertx.mod.hk2.version>1.4.0-final</vertx.mod.hk2.version>
+        <vertx.mod.hk2.version>1.5.0-final</vertx.mod.hk2.version>
         <java.inject.version>1</java.inject.version>
     </properties>
 
@@ -28,18 +28,6 @@
             <groupId>com.englishtown</groupId>
             <artifactId>when.java</artifactId>
             <version>${when.java.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-            <version>${java.inject.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.englishtown</groupId>
-            <artifactId>when.java-testtools</artifactId>
-            <version>${when.java.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
@@ -52,6 +40,12 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.englishtown</groupId>
+            <artifactId>when.java-testtools</artifactId>
+            <version>${when.java.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

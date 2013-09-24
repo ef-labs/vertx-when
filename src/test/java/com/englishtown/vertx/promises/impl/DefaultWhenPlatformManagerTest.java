@@ -37,7 +37,7 @@ public class DefaultWhenPlatformManagerTest {
     ArgumentCaptor<Handler<AsyncResult<String>>> handlerCaptor;
 
     String main = "com.englishtown.test.Verticle";
-    String moduleName = "com.englishtown~vertx-mod-when~1.0.0";
+    String moduleName = "com.englishtown~vertx-mod-when~1.1.0-final";
 
     @Before
     public void setUp() {
