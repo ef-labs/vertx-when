@@ -9,11 +9,7 @@ import org.vertx.java.core.http.HttpClientResponse;
 import java.net.URI;
 
 /**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 7/25/13
- * Time: 12:01 PM
- * To change this template use File | Settings | File Templates.
+ * When.java wrapper for vert.x {@link HttpClient} methods
  */
 public interface WhenHttpClient {
 

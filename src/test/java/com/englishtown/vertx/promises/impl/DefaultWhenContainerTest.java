@@ -20,11 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 7/26/13
- * Time: 5:26 PM
- * To change this template use File | Settings | File Templates.
+ * Unit tests for {@link DefaultWhenContainer}
  */
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultWhenContainerTest {

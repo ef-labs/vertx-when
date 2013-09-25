@@ -46,6 +46,7 @@ public class DefaultWhenHttpClientTest {
     @Captor
     ArgumentCaptor<Handler<HttpClientResponse>> handlerCaptor;
 
+    @SuppressWarnings("unchecked")
     @Before
     public void setUp() throws Exception {
         when(vertx.createHttpClient()).thenReturn(client);

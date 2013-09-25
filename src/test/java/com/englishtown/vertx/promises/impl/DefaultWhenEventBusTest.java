@@ -24,6 +24,7 @@ import static org.mockito.Mockito.*;
 /**
  * Unit tests for {@link DefaultWhenEventBus}
  */
+@SuppressWarnings("unchecked")
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultWhenEventBusTest {
 

@@ -27,15 +27,7 @@ import static org.vertx.testtools.VertxAssert.testComplete;
 /**
  * Integration tests
  */
-//@RunWith(CPJavaClassRunner.class)
 public class IntegrationTest extends TestVerticle {
-
-//    private WhenContainer whenContainer;
-//    private ;
-//    private WhenHttpClient whenHttpClient;
-//    whenContainer = new DefaultWhenContainer(container);
-//    whenHttpClient = new DefaultWhenHttpClient(vertx);
-
 
     @Test
     public void testDeployVerticle() {
@@ -126,10 +118,4 @@ public class IntegrationTest extends TestVerticle {
         });
     }
 
-    @Override
-    public void start() {
-
-
-        super.start();
-    }
 }
