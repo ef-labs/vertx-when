@@ -18,7 +18,8 @@
 
     <properties>
         <!--Dependency versions-->
-        <when.java.version>1.0.0</when.java.version>
+        <when.java.version>1.1.0-SNAPSHOT</when.java.version>
+        <when.java.testtools.version>1.0.0</when.java.testtools.version>
         <vertx.mod.hk2.version>1.6.0-SNAPSHOT</vertx.mod.hk2.version>
         <java.inject.version>1</java.inject.version>
     </properties>
@@ -45,7 +46,7 @@
         <dependency>
             <groupId>com.englishtown</groupId>
             <artifactId>when.java-testtools</artifactId>
-            <version>${when.java.version}</version>
+            <version>${when.java.testtools.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
