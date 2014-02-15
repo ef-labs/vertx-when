@@ -108,4 +108,18 @@ public interface WhenContainer {
      */
     Promise<String, Void> deployWorkerVerticle(String main, JsonObject config, int instances, boolean multiThreaded);
 
+    /**
+     * Undeploy a verticle
+     *
+     * @param deploymentID The deployment ID
+     */
+    Promise<Void, Void> undeployVerticle(String deploymentID);
+
+    /**
+     * Undeploy a module
+     *
+     * @param deploymentID The deployment ID
+     */
+    Promise<Void, Void> undeployModule(String deploymentID);
+
 }

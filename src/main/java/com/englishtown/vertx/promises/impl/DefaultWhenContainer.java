@@ -200,9 +200,51 @@ public class DefaultWhenContainer implements WhenContainer {
         return d.getPromise();
     }
 
+    /**
+     * Undeploy a verticle
+     *
+     * @param deploymentID The deployment ID
+     */
+    @Override
+    public Promise<Void, Void> undeployVerticle(String deploymentID) {
+        final Deferred<Void, Void> d = new When<Void, Void>().defer();
+        container.undeployVerticle(deploymentID, new Handler<AsyncResult<Void>>() {
+            @Override
+            public void handle(AsyncResult<Void> result) {
+                if (result.succeeded()) {
+                    d.getResolver().resolve((Void) null);
+                } else {
+                    d.getResolver().reject(result.cause());
+                }
+            }
+        });
+        return d.getPromise();
+    }
+
+    /**
+     * Undeploy a module
+     *
+     * @param deploymentID The deployment ID
+     */
+    @Override
+    public Promise<Void, Void> undeployModule(String deploymentID) {
+        final Deferred<Void, Void> d = new When<Void, Void>().defer();
+        container.undeployModule(deploymentID, new Handler<AsyncResult<Void>>() {
+            @Override
+            public void handle(AsyncResult<Void> result) {
+                if (result.succeeded()) {
+                    d.getResolver().resolve((Void) null);
+                } else {
+                    d.getResolver().reject(result.cause());
+                }
+            }
+        });
+        return d.getPromise();
+
+    }
+
     protected void reject(Deferred<String, Void> d, String result, Throwable t) {
-        RuntimeException e = (t == null || t instanceof RuntimeException ? (RuntimeException) t : new RuntimeException(t));
-        d.getResolver().reject(new Value<>(result, e));
+        d.getResolver().reject(new Value<>(result, t));
     }
 
 }

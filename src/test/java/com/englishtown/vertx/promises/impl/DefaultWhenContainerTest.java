@@ -33,8 +33,12 @@ public class DefaultWhenContainerTest {
     Container container;
     @Mock
     AsyncResult<String> result;
+    @Mock
+    AsyncResult<Void> voidResult;
     @Captor
     ArgumentCaptor<Handler<AsyncResult<String>>> handlerCaptor;
+    @Captor
+    ArgumentCaptor<Handler<AsyncResult<Void>>> voidHandlerCaptor;
 
     String main = "com.englishtown.test.Verticle";
     String moduleName = "com.englishtown~vertx-mod-when~1.1.0-final";
@@ -281,6 +285,56 @@ public class DefaultWhenContainerTest {
         handlerCaptor.getValue().handle(result);
 
         promise.then(done.onSuccess, done.onFail);
+        done.assertFailed();
+    }
+
+    @Test
+    public void testUndeployVerticle() throws Exception {
+        String deploymentID = "id";
+        Done2<Void> done = new Done2<>();
+        when(voidResult.succeeded()).thenReturn(true);
+
+        whenContainer.undeployVerticle(deploymentID).then(done.onSuccess, done.onFail);
+        verify(container).undeployVerticle(eq(deploymentID), voidHandlerCaptor.capture());
+
+        voidHandlerCaptor.getValue().handle(voidResult);
+        done.assertSuccess();
+    }
+
+    @Test
+    public void testUndeployVerticle_Fail() throws Exception {
+        String deploymentID = "id";
+        Done2<Void> done = new Done2<>();
+
+        whenContainer.undeployVerticle(deploymentID).then(done.onSuccess, done.onFail);
+        verify(container).undeployVerticle(eq(deploymentID), voidHandlerCaptor.capture());
+
+        voidHandlerCaptor.getValue().handle(voidResult);
+        done.assertFailed();
+    }
+
+    @Test
+    public void testUndeployModule() throws Exception {
+        String deploymentID = "id";
+        Done2<Void> done = new Done2<>();
+        when(voidResult.succeeded()).thenReturn(true);
+
+        whenContainer.undeployModule(deploymentID).then(done.onSuccess, done.onFail);
+        verify(container).undeployModule(eq(deploymentID), voidHandlerCaptor.capture());
+
+        voidHandlerCaptor.getValue().handle(voidResult);
+        done.assertSuccess();
+    }
+
+    @Test
+    public void testUndeployModule_Fail() throws Exception {
+        String deploymentID = "id";
+        Done2<Void> done = new Done2<>();
+
+        whenContainer.undeployModule(deploymentID).then(done.onSuccess, done.onFail);
+        verify(container).undeployModule(eq(deploymentID), voidHandlerCaptor.capture());
+
+        voidHandlerCaptor.getValue().handle(voidResult);
         done.assertFailed();
     }
 
