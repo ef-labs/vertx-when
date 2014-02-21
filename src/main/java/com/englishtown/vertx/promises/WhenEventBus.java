@@ -26,7 +26,7 @@ public interface WhenEventBus {
      * @param address The address to send it to
      * @param message The message
      */
-    Promise<Message, Void> send(String address, Object message);
+    Promise<Message> send(String address, Object message);
 
     /**
      * Send an object as a message
@@ -35,7 +35,7 @@ public interface WhenEventBus {
      * @param message The message
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
-    <T> Promise<Message<T>, Void> sendWithTimeout(String address, Object message, long timeout);
+    <T> Promise<Message<T>> sendWithTimeout(String address, Object message, long timeout);
 
     /**
      * Send a JSON object as a message
@@ -43,7 +43,7 @@ public interface WhenEventBus {
      * @param address The address to send it to
      * @param message The message
      */
-    <T> Promise<Message<T>, Void> send(String address, JsonObject message);
+    <T> Promise<Message<T>> send(String address, JsonObject message);
 
     /**
      * Send a JSON object as a message
@@ -52,7 +52,7 @@ public interface WhenEventBus {
      * @param message The message
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
-    <T> Promise<Message<T>, Void> sendWithTimeout(String address, JsonObject message, long timeout);
+    <T> Promise<Message<T>> sendWithTimeout(String address, JsonObject message, long timeout);
 
     /**
      * Send a JSON array as a message
@@ -60,7 +60,7 @@ public interface WhenEventBus {
      * @param address The address to send it to
      * @param message The message
      */
-    <T> Promise<Message<T>, Void> send(String address, JsonArray message);
+    <T> Promise<Message<T>> send(String address, JsonArray message);
 
     /**
      * Send a JSON array as a message
@@ -69,7 +69,7 @@ public interface WhenEventBus {
      * @param message The message
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
-    <T> Promise<Message<T>, Void> sendWithTimeout(String address, JsonArray message, long timeout);
+    <T> Promise<Message<T>> sendWithTimeout(String address, JsonArray message, long timeout);
 
     /**
      * Send a Buffer as a message
@@ -77,7 +77,7 @@ public interface WhenEventBus {
      * @param address The address to send it to
      * @param message The message
      */
-    <T> Promise<Message<T>, Void> send(String address, Buffer message);
+    <T> Promise<Message<T>> send(String address, Buffer message);
 
     /**
      * Send a Buffer object as a message
@@ -86,7 +86,7 @@ public interface WhenEventBus {
      * @param message The message
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
-    <T> Promise<Message<T>, Void> sendWithTimeout(String address, Buffer message, long timeout);
+    <T> Promise<Message<T>> sendWithTimeout(String address, Buffer message, long timeout);
 
     /**
      * Send a byte[] as a message
@@ -94,7 +94,7 @@ public interface WhenEventBus {
      * @param address The address to send it to
      * @param message The message
      */
-    <T> Promise<Message<T>, Void> send(String address, byte[] message);
+    <T> Promise<Message<T>> send(String address, byte[] message);
 
     /**
      * Send a byte[] object as a message
@@ -103,7 +103,7 @@ public interface WhenEventBus {
      * @param message The message
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
-    <T> Promise<Message<T>, Void> sendWithTimeout(String address, byte[] message, long timeout);
+    <T> Promise<Message<T>> sendWithTimeout(String address, byte[] message, long timeout);
 
     /**
      * Send a String as a message
@@ -111,7 +111,7 @@ public interface WhenEventBus {
      * @param address The address to send it to
      * @param message The message
      */
-    <T> Promise<Message<T>, Void> send(String address, String message);
+    <T> Promise<Message<T>> send(String address, String message);
 
     /**
      * Send a string object as a message
@@ -120,7 +120,7 @@ public interface WhenEventBus {
      * @param message The message
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
-    <T> Promise<Message<T>, Void> sendWithTimeout(String address, String message, long timeout);
+    <T> Promise<Message<T>> sendWithTimeout(String address, String message, long timeout);
 
     /**
      * Send an Integer as a message
@@ -128,7 +128,7 @@ public interface WhenEventBus {
      * @param address The address to send it to
      * @param message The message
      */
-    <T> Promise<Message<T>, Void> send(String address, Integer message);
+    <T> Promise<Message<T>> send(String address, Integer message);
 
     /**
      * Send an Integer as a message
@@ -137,7 +137,7 @@ public interface WhenEventBus {
      * @param message The message
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
-    <T> Promise<Message<T>, Void> sendWithTimeout(String address, Integer message, long timeout);
+    <T> Promise<Message<T>> sendWithTimeout(String address, Integer message, long timeout);
 
     /**
      * Send a Long as a message
@@ -145,7 +145,7 @@ public interface WhenEventBus {
      * @param address The address to send it to
      * @param message The message
      */
-    <T> Promise<Message<T>, Void> send(String address, Long message);
+    <T> Promise<Message<T>> send(String address, Long message);
 
     /**
      * Send a long as a message
@@ -154,7 +154,7 @@ public interface WhenEventBus {
      * @param message The message
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
-    <T> Promise<Message<T>, Void> sendWithTimeout(String address, Long message, long timeout);
+    <T> Promise<Message<T>> sendWithTimeout(String address, Long message, long timeout);
 
     /**
      * Send a Float as a message
@@ -162,7 +162,7 @@ public interface WhenEventBus {
      * @param address The address to send it to
      * @param message The message
      */
-    <T> Promise<Message<T>, Void> send(String address, Float message);
+    <T> Promise<Message<T>> send(String address, Float message);
 
     /**
      * Send a float as a message
@@ -171,7 +171,7 @@ public interface WhenEventBus {
      * @param message The message
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
-    <T> Promise<Message<T>, Void> sendWithTimeout(String address, Float message, long timeout);
+    <T> Promise<Message<T>> sendWithTimeout(String address, Float message, long timeout);
 
     /**
      * Send a Double as a message
@@ -179,7 +179,7 @@ public interface WhenEventBus {
      * @param address The address to send it to
      * @param message The message
      */
-    <T> Promise<Message<T>, Void> send(String address, Double message);
+    <T> Promise<Message<T>> send(String address, Double message);
 
     /**
      * Send a double as a message
@@ -188,7 +188,7 @@ public interface WhenEventBus {
      * @param message The message
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
-    <T> Promise<Message<T>, Void> sendWithTimeout(String address, Double message, long timeout);
+    <T> Promise<Message<T>> sendWithTimeout(String address, Double message, long timeout);
 
     /**
      * Send a Boolean as a message
@@ -196,7 +196,7 @@ public interface WhenEventBus {
      * @param address The address to send it to
      * @param message The message
      */
-    <T> Promise<Message<T>, Void> send(String address, Boolean message);
+    <T> Promise<Message<T>> send(String address, Boolean message);
 
     /**
      * Send a boolean as a message
@@ -205,7 +205,7 @@ public interface WhenEventBus {
      * @param message The message
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
-    <T> Promise<Message<T>, Void> sendWithTimeout(String address, Boolean message, long timeout);
+    <T> Promise<Message<T>> sendWithTimeout(String address, Boolean message, long timeout);
 
     /**
      * Send a Short as a message
@@ -213,7 +213,7 @@ public interface WhenEventBus {
      * @param address The address to send it to
      * @param message The message
      */
-    <T> Promise<Message<T>, Void> send(String address, Short message);
+    <T> Promise<Message<T>> send(String address, Short message);
 
     /**
      * Send a short as a message
@@ -222,7 +222,7 @@ public interface WhenEventBus {
      * @param message The message
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
-    <T> Promise<Message<T>, Void> sendWithTimeout(String address, Short message, long timeout);
+    <T> Promise<Message<T>> sendWithTimeout(String address, Short message, long timeout);
 
     /**
      * Send a Character as a message
@@ -230,7 +230,7 @@ public interface WhenEventBus {
      * @param address The address to send it to
      * @param message The message
      */
-    <T> Promise<Message<T>, Void> send(String address, Character message);
+    <T> Promise<Message<T>> send(String address, Character message);
 
     /**
      * Send a character as a message
@@ -239,7 +239,7 @@ public interface WhenEventBus {
      * @param message The message
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
-    <T> Promise<Message<T>, Void> sendWithTimeout(String address, Character message, long timeout);
+    <T> Promise<Message<T>> sendWithTimeout(String address, Character message, long timeout);
 
     /**
      * Send a Byte as a message
@@ -247,7 +247,7 @@ public interface WhenEventBus {
      * @param address The address to send it to
      * @param message The message
      */
-    <T> Promise<Message<T>, Void> send(String address, Byte message);
+    <T> Promise<Message<T>> send(String address, Byte message);
 
     /**
      * Send a byte as a message
@@ -256,7 +256,7 @@ public interface WhenEventBus {
      * @param message The message
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
-    <T> Promise<Message<T>, Void> sendWithTimeout(String address, Byte message, long timeout);
+    <T> Promise<Message<T>> sendWithTimeout(String address, Byte message, long timeout);
 
     /**
      * Unregisters a handler given the address and the handler
@@ -264,7 +264,7 @@ public interface WhenEventBus {
      * @param address The address the handler was registered at
      * @param handler The handler
      */
-    Promise<Void, Void> unregisterHandler(String address, Handler<? extends Message> handler);
+    Promise<Void> unregisterHandler(String address, Handler<? extends Message> handler);
 
     /**
      * Registers a handler against the specified address
@@ -272,6 +272,6 @@ public interface WhenEventBus {
      * @param address The address to register it at
      * @param handler The handler
      */
-    Promise<Void, Void> registerHandler(String address, Handler<? extends Message> handler);
+    Promise<Void> registerHandler(String address, Handler<? extends Message> handler);
 
 }

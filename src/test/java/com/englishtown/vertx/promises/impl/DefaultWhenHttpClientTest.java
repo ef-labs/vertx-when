@@ -1,7 +1,6 @@
 package com.englishtown.vertx.promises.impl;
 
 import com.englishtown.promises.*;
-import com.englishtown.promises.Runnable;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Before;
@@ -120,23 +119,23 @@ public class DefaultWhenHttpClientTest {
 
     public void test() {
 
-        List<Promise<HttpClientResponse, Void>> promises = new ArrayList<>();
-        When<HttpClientResponse, Void> when = new When<>();
+        List<Promise<HttpClientResponse>> promises = new ArrayList<>();
+        When<HttpClientResponse> when = new When<>();
 
         promises.add(whenHttpClient.request(HttpMethod.GET.name(), URI.create("http://test.englishtown.com/test1")));
         promises.add(whenHttpClient.request(HttpMethod.POST.name(), URI.create("http://test.englishtown.com/test2")));
 
         when.all(promises,
-                new Runnable<Promise<List<HttpClientResponse>, Void>, List<HttpClientResponse>>() {
+                new FulfilledRunnable<List<? extends HttpClientResponse>>() {
                     @Override
-                    public Promise<List<HttpClientResponse>, Void> run(List<HttpClientResponse> value) {
+                    public Promise<List<? extends HttpClientResponse>> run(List<? extends HttpClientResponse> value) {
                         // On success
                         return null;
                     }
                 },
-                new Runnable<Promise<List<HttpClientResponse>, Void>, Value<List<HttpClientResponse>>>() {
+                new RejectedRunnable<List<? extends HttpClientResponse>>() {
                     @Override
-                    public Promise<List<HttpClientResponse>, Void> run(Value<List<HttpClientResponse>> value) {
+                    public Promise<List<? extends HttpClientResponse>> run(Value<List<? extends HttpClientResponse>> value) {
                         // On fail
                         return null;
                     }

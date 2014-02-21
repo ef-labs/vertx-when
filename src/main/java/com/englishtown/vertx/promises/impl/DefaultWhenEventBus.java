@@ -55,8 +55,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public Promise<Message, Void> send(String address, Object message) {
-        final Deferred<Message, Void> d = new When<Message, Void>().defer();
+    public Promise<Message> send(String address, Object message) {
+        final Deferred<Message> d = new When<Message>().defer();
         eventBus.send(address, message, new Handler<Message>() {
             @Override
             public void handle(Message reply) {
@@ -74,8 +74,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
     @Override
-    public <T> Promise<Message<T>, Void> sendWithTimeout(String address, Object message, long timeout) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> sendWithTimeout(String address, Object message, long timeout) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
             @Override
             public void handle(AsyncResult<Message<T>> result) {
@@ -90,8 +90,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public <T> Promise<Message<T>, Void> send(String address, JsonObject message) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> send(String address, JsonObject message) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.send(address, message, new Handler<Message<T>>() {
             @Override
             public void handle(Message<T> reply) {
@@ -109,8 +109,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
     @Override
-    public <T> Promise<Message<T>, Void> sendWithTimeout(String address, JsonObject message, long timeout) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> sendWithTimeout(String address, JsonObject message, long timeout) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
             @Override
             public void handle(AsyncResult<Message<T>> result) {
@@ -125,8 +125,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public <T> Promise<Message<T>, Void> send(String address, JsonArray message) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> send(String address, JsonArray message) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.send(address, message, new Handler<Message<T>>() {
             @Override
             public void handle(Message<T> reply) {
@@ -144,8 +144,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
     @Override
-    public <T> Promise<Message<T>, Void> sendWithTimeout(String address, JsonArray message, long timeout) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> sendWithTimeout(String address, JsonArray message, long timeout) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
             @Override
             public void handle(AsyncResult<Message<T>> result) {
@@ -160,8 +160,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public <T> Promise<Message<T>, Void> send(String address, Buffer message) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> send(String address, Buffer message) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.send(address, message, new Handler<Message<T>>() {
             @Override
             public void handle(Message<T> reply) {
@@ -179,8 +179,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
     @Override
-    public <T> Promise<Message<T>, Void> sendWithTimeout(String address, Buffer message, long timeout) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> sendWithTimeout(String address, Buffer message, long timeout) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
             @Override
             public void handle(AsyncResult<Message<T>> result) {
@@ -195,8 +195,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public <T> Promise<Message<T>, Void> send(String address, byte[] message) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> send(String address, byte[] message) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.send(address, message, new Handler<Message<T>>() {
             @Override
             public void handle(Message<T> reply) {
@@ -214,8 +214,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
     @Override
-    public <T> Promise<Message<T>, Void> sendWithTimeout(String address, byte[] message, long timeout) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> sendWithTimeout(String address, byte[] message, long timeout) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
             @Override
             public void handle(AsyncResult<Message<T>> result) {
@@ -230,8 +230,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public <T> Promise<Message<T>, Void> send(String address, String message) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> send(String address, String message) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.send(address, message, new Handler<Message<T>>() {
             @Override
             public void handle(Message<T> reply) {
@@ -249,8 +249,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
     @Override
-    public <T> Promise<Message<T>, Void> sendWithTimeout(String address, String message, long timeout) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> sendWithTimeout(String address, String message, long timeout) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
             @Override
             public void handle(AsyncResult<Message<T>> result) {
@@ -265,8 +265,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public <T> Promise<Message<T>, Void> send(String address, Integer message) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> send(String address, Integer message) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.send(address, message, new Handler<Message<T>>() {
             @Override
             public void handle(Message<T> reply) {
@@ -284,8 +284,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
     @Override
-    public <T> Promise<Message<T>, Void> sendWithTimeout(String address, Integer message, long timeout) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> sendWithTimeout(String address, Integer message, long timeout) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
             @Override
             public void handle(AsyncResult<Message<T>> result) {
@@ -300,8 +300,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public <T> Promise<Message<T>, Void> send(String address, Long message) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> send(String address, Long message) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.send(address, message, new Handler<Message<T>>() {
             @Override
             public void handle(Message<T> reply) {
@@ -319,8 +319,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
     @Override
-    public <T> Promise<Message<T>, Void> sendWithTimeout(String address, Long message, long timeout) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> sendWithTimeout(String address, Long message, long timeout) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
             @Override
             public void handle(AsyncResult<Message<T>> result) {
@@ -335,8 +335,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public <T> Promise<Message<T>, Void> send(String address, Float message) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> send(String address, Float message) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.send(address, message, new Handler<Message<T>>() {
             @Override
             public void handle(Message<T> reply) {
@@ -354,8 +354,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
     @Override
-    public <T> Promise<Message<T>, Void> sendWithTimeout(String address, Float message, long timeout) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> sendWithTimeout(String address, Float message, long timeout) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
             @Override
             public void handle(AsyncResult<Message<T>> result) {
@@ -370,8 +370,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public <T> Promise<Message<T>, Void> send(String address, Double message) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> send(String address, Double message) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.send(address, message, new Handler<Message<T>>() {
             @Override
             public void handle(Message<T> reply) {
@@ -389,8 +389,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
     @Override
-    public <T> Promise<Message<T>, Void> sendWithTimeout(String address, Double message, long timeout) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> sendWithTimeout(String address, Double message, long timeout) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
             @Override
             public void handle(AsyncResult<Message<T>> result) {
@@ -405,8 +405,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public <T> Promise<Message<T>, Void> send(String address, Boolean message) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> send(String address, Boolean message) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.send(address, message, new Handler<Message<T>>() {
             @Override
             public void handle(Message<T> reply) {
@@ -424,8 +424,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
     @Override
-    public <T> Promise<Message<T>, Void> sendWithTimeout(String address, Boolean message, long timeout) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> sendWithTimeout(String address, Boolean message, long timeout) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
             @Override
             public void handle(AsyncResult<Message<T>> result) {
@@ -440,8 +440,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public <T> Promise<Message<T>, Void> send(String address, Short message) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> send(String address, Short message) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.send(address, message, new Handler<Message<T>>() {
             @Override
             public void handle(Message<T> reply) {
@@ -459,8 +459,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
     @Override
-    public <T> Promise<Message<T>, Void> sendWithTimeout(String address, Short message, long timeout) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> sendWithTimeout(String address, Short message, long timeout) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
             @Override
             public void handle(AsyncResult<Message<T>> result) {
@@ -475,8 +475,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public <T> Promise<Message<T>, Void> send(String address, Character message) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> send(String address, Character message) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.send(address, message, new Handler<Message<T>>() {
             @Override
             public void handle(Message<T> reply) {
@@ -494,8 +494,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
     @Override
-    public <T> Promise<Message<T>, Void> sendWithTimeout(String address, Character message, long timeout) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> sendWithTimeout(String address, Character message, long timeout) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
             @Override
             public void handle(AsyncResult<Message<T>> result) {
@@ -510,8 +510,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public <T> Promise<Message<T>, Void> send(String address, Byte message) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> send(String address, Byte message) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.send(address, message, new Handler<Message<T>>() {
             @Override
             public void handle(Message<T> reply) {
@@ -529,8 +529,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
      * @param timeout - Timeout in ms. If no reply received within the timeout then the reply handler will be unregistered
      */
     @Override
-    public <T> Promise<Message<T>, Void> sendWithTimeout(String address, Byte message, long timeout) {
-        final Deferred<Message<T>, Void> d = new When<Message<T>, Void>().defer();
+    public <T> Promise<Message<T>> sendWithTimeout(String address, Byte message, long timeout) {
+        final Deferred<Message<T>> d = new When<Message<T>>().defer();
         eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
             @Override
             public void handle(AsyncResult<Message<T>> result) {
@@ -545,8 +545,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public Promise<Void, Void> unregisterHandler(String address, Handler<? extends Message> handler) {
-        final Deferred<Void, Void> d = new When<Void, Void>().defer();
+    public Promise<Void> unregisterHandler(String address, Handler<? extends Message> handler) {
+        final Deferred<Void> d = new When<Void>().defer();
         eventBus.unregisterHandler(address, handler, new Handler<AsyncResult<Void>>() {
             @Override
             public void handle(AsyncResult<Void> result) {
@@ -561,8 +561,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
     }
 
     @Override
-    public Promise<Void, Void> registerHandler(String address, Handler<? extends Message> handler) {
-        final Deferred<Void, Void> d = new When<Void, Void>().defer();
+    public Promise<Void> registerHandler(String address, Handler<? extends Message> handler) {
+        final Deferred<Void> d = new When<Void>().defer();
         eventBus.registerHandler(address, handler, new Handler<AsyncResult<Void>>() {
             @Override
             public void handle(AsyncResult<Void> result) {

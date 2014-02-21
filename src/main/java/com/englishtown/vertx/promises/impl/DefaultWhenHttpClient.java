@@ -22,7 +22,7 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
     public static int CONNECT_TIMEOUT = 10000;
 
     private final Vertx vertx;
-    private final When<HttpClientResponse, Void> when = new When<>();
+    private final When<HttpClientResponse> when = new When<>();
 
     @Inject
     public DefaultWhenHttpClient(Vertx vertx) {
@@ -37,7 +37,7 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
      * @return a promise for the HttpClientResponse
      */
     @Override
-    public Promise<HttpClientResponse, Void> request(String method, URI url) {
+    public Promise<HttpClientResponse> request(String method, URI url) {
         return request(method, url, null);
     }
 
@@ -50,9 +50,9 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
      * @return a promise for the HttpClientResponse
      */
     @Override
-    public Promise<HttpClientResponse, Void> request(String method, URI url, Handler<HttpClientRequest> setupHandler) {
+    public Promise<HttpClientResponse> request(String method, URI url, Handler<HttpClientRequest> setupHandler) {
 
-        final Deferred<HttpClientResponse, Void> d = when.defer();
+        final Deferred<HttpClientResponse> d = when.defer();
 
         try {
             HttpClient client = createClient(url, d);
@@ -74,7 +74,7 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
      * @return a promise for the HttpClientResponse
      */
     @Override
-    public Promise<HttpClientResponse, Void> request(String method, String url, HttpClient client) {
+    public Promise<HttpClientResponse> request(String method, String url, HttpClient client) {
         return request(method, url, client, null);
     }
 
@@ -88,13 +88,13 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
      * @return a promise for the HttpClientResponse
      */
     @Override
-    public Promise<HttpClientResponse, Void> request(String method, String url, HttpClient client, Handler<HttpClientRequest> setupHandler) {
-        final Deferred<HttpClientResponse, Void> d = when.defer();
+    public Promise<HttpClientResponse> request(String method, String url, HttpClient client, Handler<HttpClientRequest> setupHandler) {
+        final Deferred<HttpClientResponse> d = when.defer();
         return request(d, method, url, client, setupHandler);
     }
 
-    protected Promise<HttpClientResponse, Void> request(
-            final Deferred<HttpClientResponse, Void> d,
+    protected Promise<HttpClientResponse> request(
+            final Deferred<HttpClientResponse> d,
             String method,
             String url,
             HttpClient client,
@@ -133,7 +133,7 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
 
     }
 
-    protected HttpClient createClient(URI url, final Deferred<HttpClientResponse, Void> d) {
+    protected HttpClient createClient(URI url, final Deferred<HttpClientResponse> d) {
 
         if (url == null) throw new IllegalArgumentException("url is null");
         if (!url.isAbsolute()) throw new IllegalArgumentException("url must be absolute");
@@ -163,7 +163,7 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
         return path.toString();
     }
 
-    protected void reject(Deferred<HttpClientResponse, Void> d, Throwable t) {
+    protected void reject(Deferred<HttpClientResponse> d, Throwable t) {
         RuntimeException e = (t instanceof RuntimeException ? (RuntimeException) t : new RuntimeException(t));
         d.getResolver().reject(new Value<HttpClientResponse>(null, e));
     }

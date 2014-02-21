@@ -12,7 +12,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Container;
 import org.vertx.java.platform.PlatformManager;
 
 import java.net.URL;
@@ -26,11 +25,11 @@ import static org.mockito.Mockito.when;
 public class DefaultWhenPlatformManagerTest {
 
     private DefaultWhenPlatformManager defaultWhenPlatformManager;
-    private Promise<String, Void> promise;
+    private Promise<String> promise;
     private Done2<String> done = new Done2<>();
 
     @Mock
-	PlatformManager manager;
+    PlatformManager manager;
     @Mock
     AsyncResult<String> result;
     @Captor

@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 public class DefaultWhenContainerTest {
 
     private DefaultWhenContainer whenContainer;
-    private Promise<String, Void> promise;
+    private Promise<String> promise;
     private Done2<String> done = new Done2<>();
 
     @Mock

@@ -20,7 +20,7 @@ public interface WhenHttpClient {
      * @param url    the {@link java.net.URI} to send the request to
      * @return a promise for the HttpClientResponse
      */
-    Promise<HttpClientResponse, Void> request(
+    Promise<HttpClientResponse> request(
             String method,
             URI url);
 
@@ -32,7 +32,7 @@ public interface WhenHttpClient {
      * @param setupHandler optional setup handler.  If provided it must call end() on the {@link org.vertx.java.core.http.HttpClientRequest}
      * @return a promise for the HttpClientResponse
      */
-    Promise<HttpClientResponse, Void> request(
+    Promise<HttpClientResponse> request(
             String method,
             URI url,
             Handler<HttpClientRequest> setupHandler);
@@ -45,7 +45,7 @@ public interface WhenHttpClient {
      * @param client       the vertx http client to use
      * @return a promise for the HttpClientResponse
      */
-    Promise<HttpClientResponse, Void> request(
+    Promise<HttpClientResponse> request(
             String method,
             String url,
             HttpClient client);
@@ -59,7 +59,7 @@ public interface WhenHttpClient {
      * @param setupHandler optional setup handler.  If provided it must call end() on the {@link org.vertx.java.core.http.HttpClientRequest}
      * @return a promise for the HttpClientResponse
      */
-    Promise<HttpClientResponse, Void> request(
+    Promise<HttpClientResponse> request(
             String method,
             String url,
             HttpClient client,

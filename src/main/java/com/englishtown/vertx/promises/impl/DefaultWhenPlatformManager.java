@@ -20,19 +20,19 @@ import java.util.Map;
 public class DefaultWhenPlatformManager implements WhenPlatformManager {
 
 	private final PlatformManager manager;
-	private final When<String, Void> when = new When<>();
+	private final When<String> when = new When<>();
 
 	@Inject
 	public DefaultWhenPlatformManager(PlatformManager manager) {
 		this.manager = manager;
 	}
 
-	protected void reject(Deferred<String, Void> d, String result, Throwable t) {
+	protected void reject(Deferred<String> d, String result, Throwable t) {
 		RuntimeException e = (t == null || t instanceof RuntimeException ? (RuntimeException) t : new RuntimeException(t));
 		d.getResolver().reject(new Value<>(result, e));
 	}
 
-	protected void reject(Deferred<Void, Void> d, Void result, Throwable t) {
+	protected void reject(Deferred<Void> d, Void result, Throwable t) {
 		RuntimeException e = (t == null || t instanceof RuntimeException ? (RuntimeException) t : new RuntimeException(t));
 		d.getResolver().reject(new Value<>(result, e));
 	}
@@ -48,8 +48,8 @@ public class DefaultWhenPlatformManager implements WhenPlatformManager {
 	 * @return Promise of deployment
 	 */
 	@Override
-	public Promise<String, Void> deployVerticle(String main, JsonObject config, URL[] classpath, int instances, String includes) {
-		final Deferred<String, Void> d = when.defer();
+	public Promise<String> deployVerticle(String main, JsonObject config, URL[] classpath, int instances, String includes) {
+		final Deferred<String> d = when.defer();
 
 		manager.deployVerticle(main, config, classpath, instances, includes, new Handler<AsyncResult<String>>() {
 			@Override
@@ -77,8 +77,8 @@ public class DefaultWhenPlatformManager implements WhenPlatformManager {
 	 * @return Promise of deployment
 	 */
 	@Override
-	public Promise<String, Void> deployWorkerVerticle(boolean multiThreaded, String main, JsonObject config, URL[] classpath, int instances, String includes) {
-		final Deferred<String, Void> d = when.defer();
+	public Promise<String> deployWorkerVerticle(boolean multiThreaded, String main, JsonObject config, URL[] classpath, int instances, String includes) {
+		final Deferred<String> d = when.defer();
 
 		manager.deployWorkerVerticle(multiThreaded, main, config, classpath, instances, includes, new Handler<AsyncResult<String>>() {
 			@Override
@@ -103,8 +103,8 @@ public class DefaultWhenPlatformManager implements WhenPlatformManager {
 	 * @return Promise of deployment
 	 */
 	@Override
-	public Promise<String, Void> deployModule(String moduleName, JsonObject config, int instances) {
-		final Deferred<String, Void> d = when.defer();
+	public Promise<String> deployModule(String moduleName, JsonObject config, int instances) {
+		final Deferred<String> d = when.defer();
 
 		manager.deployModule(moduleName, config, instances, new Handler<AsyncResult<String>>() {
 			@Override
@@ -129,8 +129,8 @@ public class DefaultWhenPlatformManager implements WhenPlatformManager {
 	 * @return Promise of deployment
 	 */
 	@Override
-	public Promise<String, Void> deployModuleFromZip(String zipFileName, JsonObject config, int instances) {
-		final Deferred<String, Void> d = when.defer();
+	public Promise<String> deployModuleFromZip(String zipFileName, JsonObject config, int instances) {
+		final Deferred<String> d = when.defer();
 
 		manager.deployModuleFromZip(zipFileName, config, instances, new Handler<AsyncResult<String>>() {
 			@Override
@@ -156,8 +156,8 @@ public class DefaultWhenPlatformManager implements WhenPlatformManager {
 	 * @return Promise of deployment
 	 */
 	@Override
-	public Promise<String, Void> deployModuleFromClasspath(String moduleName, JsonObject config, int instances, URL[] classpath) {
-		final Deferred<String, Void> d = when.defer();
+	public Promise<String> deployModuleFromClasspath(String moduleName, JsonObject config, int instances, URL[] classpath) {
+		final Deferred<String> d = when.defer();
 
 		manager.deployModuleFromClasspath(moduleName, config, instances, classpath, new Handler<AsyncResult<String>>() {
 			@Override
@@ -180,8 +180,8 @@ public class DefaultWhenPlatformManager implements WhenPlatformManager {
 	 * @return Promise of undeployment
 	 */
 	@Override
-	public Promise<Void, Void> undeploy(String deploymentID) {
-		final Deferred<Void, Void> d = new When<Void, Void>().defer();
+	public Promise<Void> undeploy(String deploymentID) {
+		final Deferred<Void> d = new When<Void>().defer();
 
 		manager.undeploy(deploymentID, new Handler<AsyncResult<Void>>() {
 			@Override
@@ -203,8 +203,8 @@ public class DefaultWhenPlatformManager implements WhenPlatformManager {
 	 * @return Promise of undeployment
 	 */
 	@Override
-	public Promise<Void, Void> undeployAll() {
-		final Deferred<Void, Void> d = new When<Void, Void>().defer();
+	public Promise<Void> undeployAll() {
+		final Deferred<Void> d = new When<Void>().defer();
 
 		manager.undeployAll(new Handler<AsyncResult<Void>>() {
 			@Override
@@ -237,8 +237,8 @@ public class DefaultWhenPlatformManager implements WhenPlatformManager {
 	 * @return Promise of installation
 	 */
 	@Override
-	public Promise<Void, Void> installModule(String moduleName) {
-		final Deferred<Void, Void> d = new When<Void, Void>().defer();
+	public Promise<Void> installModule(String moduleName) {
+		final Deferred<Void> d = new When<Void>().defer();
 
 		manager.installModule(moduleName, new Handler<AsyncResult<Void>>() {
 			@Override
@@ -261,8 +261,8 @@ public class DefaultWhenPlatformManager implements WhenPlatformManager {
 	 * @return Promise of uninstallation
 	 */
 	@Override
-	public Promise<Void, Void> uninstallModule(String moduleName) {
-		final Deferred<Void, Void> d = new When<Void, Void>().defer();
+	public Promise<Void> uninstallModule(String moduleName) {
+		final Deferred<Void> d = new When<Void>().defer();
 
 		manager.uninstallModule(moduleName, new Handler<AsyncResult<Void>>() {
 			@Override
@@ -285,8 +285,8 @@ public class DefaultWhenPlatformManager implements WhenPlatformManager {
 	 * @return Promise of pull
 	 */
 	@Override
-	public Promise<Void, Void> pullInDependencies(String moduleName) {
-		final Deferred<Void, Void> d = new When<Void, Void>().defer();
+	public Promise<Void> pullInDependencies(String moduleName) {
+		final Deferred<Void> d = new When<Void>().defer();
 
 		manager.pullInDependencies(moduleName, new Handler<AsyncResult<Void>>() {
 			@Override

@@ -22,7 +22,7 @@ public interface WhenPlatformManager {
 	 * @param includes  Comma separated list of modules to include, or null if none
 	 * @return Promise of deployment
 	 */
-	Promise<String, Void> deployVerticle(String main, JsonObject config, URL[] classpath, int instances, String includes);
+	Promise<String> deployVerticle(String main, JsonObject config, URL[] classpath, int instances, String includes);
 
 	/**
 	 * Deploy a worker verticle
@@ -35,7 +35,7 @@ public interface WhenPlatformManager {
 	 * @param includes      Comma separated list of modules to include, or null if none
 	 * @return Promise of deployment
 	 */
-	Promise<String, Void> deployWorkerVerticle(boolean multiThreaded, String main, JsonObject config, URL[] classpath, int instances, String includes);
+	Promise<String> deployWorkerVerticle(boolean multiThreaded, String main, JsonObject config, URL[] classpath, int instances, String includes);
 
 	/**
 	 * Deploy a module
@@ -45,7 +45,7 @@ public interface WhenPlatformManager {
 	 * @param instances  The number of instances to deploy
 	 * @return Promise of deployment
 	 */
-	Promise<String, Void> deployModule(String moduleName, JsonObject config, int instances);
+	Promise<String> deployModule(String moduleName, JsonObject config, int instances);
 
 	/**
 	 * Deploy a module from a zip file. The zip must contain a valid Vert.x module. Vert.x will automatically install the module from the zip into the local mods dir or the system mods dir (if it's a system module), or VERTX_MODS if set, and then deploy the module
@@ -55,7 +55,7 @@ public interface WhenPlatformManager {
 	 * @param instances   The number of instances to deploy
 	 * @return Promise of deployment
 	 */
-	Promise<String, Void> deployModuleFromZip(String zipFileName, JsonObject config, int instances);
+	Promise<String> deployModuleFromZip(String zipFileName, JsonObject config, int instances);
 
 	/**
 	 * Deploy a module from the classpath. The classpath must contain a single mod.json and the resources for that module only.
@@ -66,7 +66,7 @@ public interface WhenPlatformManager {
 	 * @param classpath  Array of URLS corresponding to the classpath for the module
 	 * @return Promise of deployment
 	 */
-	Promise<String, Void> deployModuleFromClasspath(String moduleName, JsonObject config, int instances, URL[] classpath);
+	Promise<String> deployModuleFromClasspath(String moduleName, JsonObject config, int instances, URL[] classpath);
 
 	/**
 	 * Undeploy a deployment
@@ -74,14 +74,14 @@ public interface WhenPlatformManager {
 	 * @param deploymentID The ID of the deployment to undeploy, as given in the doneHandler when deploying
 	 * @return Promise of undeployment
 	 */
-	Promise<Void, Void> undeploy(String deploymentID);
+	Promise<Void> undeploy(String deploymentID);
 
 	/**
 	 * Undeploy all verticles and modules
 	 *
 	 * @return Promise of undeployment
 	 */
-	Promise<Void, Void> undeployAll();
+	Promise<Void> undeployAll();
 
 	/**
 	 * List all deployments, with deployment ID and number of instances
@@ -96,7 +96,7 @@ public interface WhenPlatformManager {
 	 * @param moduleName The name of the module
 	 * @return Promise of installation
 	 */
-	Promise<Void, Void> installModule(String moduleName);
+	Promise<Void> installModule(String moduleName);
 
 	/**
 	 * Uninstall a module from the filesystem
@@ -104,7 +104,7 @@ public interface WhenPlatformManager {
 	 * @param moduleName The name of the module
 	 * @return Promise of uninstallation
 	 */
-	Promise<Void, Void> uninstallModule(String moduleName);
+	Promise<Void> uninstallModule(String moduleName);
 
 	/**
 	 * Pull in all the dependencies (the 'includes' and the 'deploys' fields in mod.json) and copy them into an internal mods directory in the module. This allows a self contained module to be created.
@@ -112,7 +112,7 @@ public interface WhenPlatformManager {
 	 * @param moduleName The name of the module
 	 * @return Promise of pull
 	 */
-	Promise<Void, Void> pullInDependencies(String moduleName);
+	Promise<Void> pullInDependencies(String moduleName);
 
 	/**
 	 * Register a handler that will be called when the platform exits because of a verticle calling container.exit()

@@ -8,6 +8,6 @@ import org.vertx.java.core.http.HttpClientResponse;
  */
 public interface WhenHttpClientResponse {
 
-    Promise<HttpClientResponseAndBody, Void> body(Promise<HttpClientResponse, Void> promise);
+    Promise<HttpClientResponseAndBody> body(Promise<HttpClientResponse> promise);
 
 }

@@ -1,7 +1,8 @@
 package com.englishtown.vertx.promises.integration;
 
+import com.englishtown.promises.FulfilledRunnable;
 import com.englishtown.promises.Promise;
-import com.englishtown.promises.Runnable;
+import com.englishtown.promises.RejectedRunnable;
 import com.englishtown.promises.Value;
 import com.englishtown.vertx.promises.WhenContainer;
 import com.englishtown.vertx.promises.WhenEventBus;
@@ -20,9 +21,7 @@ import org.vertx.testtools.TestVerticle;
 
 import java.net.URI;
 
-import static org.vertx.testtools.VertxAssert.assertEquals;
-import static org.vertx.testtools.VertxAssert.fail;
-import static org.vertx.testtools.VertxAssert.testComplete;
+import static org.vertx.testtools.VertxAssert.*;
 
 /**
  * Integration tests
@@ -35,16 +34,16 @@ public class IntegrationTest extends TestVerticle {
         WhenContainer whenContainer = new DefaultWhenContainer(container);
 
         whenContainer.deployVerticle(com.englishtown.vertx.promises.integration.TestVerticle.class.getName()).then(
-                new Runnable<Promise<String, Void>, String>() {
+                new FulfilledRunnable<String>() {
                     @Override
-                    public Promise<String, Void> run(String value) {
+                    public Promise<String> run(String value) {
                         testComplete();
                         return null;
                     }
                 },
-                new Runnable<Promise<String, Void>, Value<String>>() {
+                new RejectedRunnable<String>() {
                     @Override
-                    public Promise<String, Void> run(Value<String> value) {
+                    public Promise<String> run(Value<String> value) {
                         fail();
                         return null;
                     }
@@ -63,16 +62,16 @@ public class IntegrationTest extends TestVerticle {
             public void handle(AsyncResult<String> result) {
                 if (result.succeeded()) {
                     whenEventBus.send(EventBusVerticle.ADDRESS, new JsonObject()).then(
-                            new Runnable<Promise<Message<Object>, Void>, Message<Object>>() {
+                            new FulfilledRunnable<Message<Object>>() {
                                 @Override
-                                public Promise<Message<Object>, Void> run(Message<Object> value) {
+                                public Promise<Message<Object>> run(Message<Object> value) {
                                     testComplete();
                                     return null;
                                 }
                             },
-                            new Runnable<Promise<Message<Object>, Void>, Value<Message<Object>>>() {
+                            new RejectedRunnable<Message<Object>>() {
                                 @Override
-                                public Promise<Message<Object>, Void> run(Value<Message<Object>> value) {
+                                public Promise<Message<Object>> run(Value<Message<Object>> value) {
                                     fail();
                                     return null;
                                 }
@@ -95,17 +94,17 @@ public class IntegrationTest extends TestVerticle {
             public void handle(AsyncResult<String> result) {
                 if (result.succeeded()) {
                     whenHttpClient.request(HttpMethod.GET.name(), URI.create("http://localhost:8888/test")).then(
-                            new Runnable<Promise<HttpClientResponse, Void>, HttpClientResponse>() {
+                            new FulfilledRunnable<HttpClientResponse>() {
                                 @Override
-                                public Promise<HttpClientResponse, Void> run(HttpClientResponse response) {
+                                public Promise<HttpClientResponse> run(HttpClientResponse response) {
                                     assertEquals(200, response.statusCode());
                                     testComplete();
                                     return null;
                                 }
                             },
-                            new Runnable<Promise<HttpClientResponse, Void>, Value<HttpClientResponse>>() {
+                            new RejectedRunnable<HttpClientResponse>() {
                                 @Override
-                                public Promise<HttpClientResponse, Void> run(Value<HttpClientResponse> value) {
+                                public Promise<HttpClientResponse> run(Value<HttpClientResponse> value) {
                                     fail();
                                     return null;
                                 }

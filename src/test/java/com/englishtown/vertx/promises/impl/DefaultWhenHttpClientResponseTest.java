@@ -27,13 +27,13 @@ public class DefaultWhenHttpClientResponseTest {
     Done2<HttpClientResponseAndBody> done = new Done2<>();
 
     @Mock
-    Promise<HttpClientResponse, Void> promise;
+    Promise<HttpClientResponse> promise;
     @Mock
     HttpClientResponse response;
     @Captor
-    ArgumentCaptor<com.englishtown.promises.Runnable<Promise<HttpClientResponse, Void>, HttpClientResponse>> onSuccessCaptor;
+    ArgumentCaptor<com.englishtown.promises.Runnable<Promise<HttpClientResponse>, HttpClientResponse>> onSuccessCaptor;
     @Captor
-    ArgumentCaptor<com.englishtown.promises.Runnable<Promise<HttpClientResponse, Void>, Value<HttpClientResponse>>> onFailCaptor;
+    ArgumentCaptor<com.englishtown.promises.Runnable<Promise<HttpClientResponse>, Value<HttpClientResponse>>> onFailCaptor;
     @Captor
     ArgumentCaptor<Handler<Buffer>> bodyHandlerCaptor;
 
