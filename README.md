@@ -71,7 +71,7 @@ When<Message<JsonObject>, Void> when = new When<>();
 promises.add(whenEventBus.<JsonObject>send("et.vertx.eb.1", new JsonObject().putString("message", "hello")));
 promises.add(whenEventBus.<JsonObject>send("et.vertx.eb.2", new JsonObject().putString("message", "world")));
 
-when.all(promises,
+when.all(promises).then(
         new FulfilledRunnable<List<Message<JsonObject>>>() {
             @Override
             public Promise<List<Message<JsonObject>>> run(List<Message<JsonObject>> value) {
@@ -102,7 +102,7 @@ When<HttpClientResponse, Void> when = new When<>();
 promises.add(whenHttpClient.request(HttpMethod.GET.name(), URI.create("http://test.englishtown.com/test1")));
 promises.add(whenHttpClient.request(HttpMethod.POST.name(), URI.create("http://test.englishtown.com/test2")));
 
-when.all(promises,
+when.all(promises).then(
         new FulfilledRunnable<List<HttpClientResponse>>() {
             @Override
             public Promise<List<HttpClientResponse>> run(List<HttpClientResponse> value) {

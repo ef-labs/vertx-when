@@ -125,7 +125,7 @@ public class DefaultWhenHttpClientTest {
         promises.add(whenHttpClient.request(HttpMethod.GET.name(), URI.create("http://test.englishtown.com/test1")));
         promises.add(whenHttpClient.request(HttpMethod.POST.name(), URI.create("http://test.englishtown.com/test2")));
 
-        when.all(promises,
+        when.all(promises).then(
                 new FulfilledRunnable<List<? extends HttpClientResponse>>() {
                     @Override
                     public Promise<List<? extends HttpClientResponse>> run(List<? extends HttpClientResponse> value) {
