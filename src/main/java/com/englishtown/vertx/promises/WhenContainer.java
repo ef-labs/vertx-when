@@ -1,7 +1,10 @@
 package com.englishtown.vertx.promises;
 
 import com.englishtown.promises.Promise;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
+
+import java.util.List;
 
 /**
  * When.java wrapper over a vert.x {@link org.vertx.java.platform.Container}
@@ -121,5 +124,18 @@ public interface WhenContainer {
      * @param deploymentID The deployment ID
      */
     Promise<Void> undeployModule(String deploymentID);
+
+    /**
+     * Deploys one or more modules.  The Json is of the structure:
+     * [ {
+     * "name": "groupId~artifactId~version",
+     * "instances": 1,
+     * "config": {}
+     * } ]
+     *
+     * @param modules
+     * @return
+     */
+    List<Promise<String>> deployModules(JsonArray modules);
 
 }

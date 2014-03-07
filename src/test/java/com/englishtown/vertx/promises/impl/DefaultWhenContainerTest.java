@@ -2,6 +2,7 @@ package com.englishtown.vertx.promises.impl;
 
 import com.englishtown.promises.Done2;
 import com.englishtown.promises.Promise;
+import com.englishtown.promises.When;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,11 +12,15 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -336,6 +341,26 @@ public class DefaultWhenContainerTest {
 
         voidHandlerCaptor.getValue().handle(voidResult);
         done.assertFailed();
+    }
+
+    @Test
+    public void testDeployModules() throws Exception {
+
+        JsonArray modules = new JsonArray()
+                .add(new JsonObject()
+                        .putString("name", "com.englishtown~mod1~1.0")
+                        .putNumber("instances", 2)
+                        .putObject("config", new JsonObject().putString("test", "value"))
+                )
+                .add(new JsonObject()
+                        .putString("name", "com.englishtown~mod2~1.0"))
+                .add(new JsonObject());
+
+        List<Promise<String>> promises = whenContainer.deployModules(modules);
+
+        assertEquals(2, promises.size());
+        verify(container, times(2)).deployModule(anyString(), any(JsonObject.class), anyInt(), handlerCaptor.capture());
+
     }
 
 }
