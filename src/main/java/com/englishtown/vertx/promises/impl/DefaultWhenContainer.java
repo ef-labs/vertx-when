@@ -261,6 +261,10 @@ public class DefaultWhenContainer implements WhenContainer {
     public List<Promise<String>> deployModules(JsonArray modules) {
         List<Promise<String>> promises = new ArrayList<>();
 
+        if (modules == null) {
+            return promises;
+        }
+
         for (int i = 0; i < modules.size(); i++) {
             JsonObject module = modules.get(i);
             String name = module.getString("name");

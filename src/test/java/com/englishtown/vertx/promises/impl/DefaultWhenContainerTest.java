@@ -20,9 +20,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link DefaultWhenContainer}
@@ -360,6 +358,16 @@ public class DefaultWhenContainerTest {
 
         assertEquals(2, promises.size());
         verify(container, times(2)).deployModule(anyString(), any(JsonObject.class), anyInt(), handlerCaptor.capture());
+
+    }
+
+    @Test
+    public void testDeployModules_Null() throws Exception {
+
+        List<Promise<String>> promises = whenContainer.deployModules(null);
+
+        assertEquals(0, promises.size());
+        verifyZeroInteractions(container);
 
     }
 
