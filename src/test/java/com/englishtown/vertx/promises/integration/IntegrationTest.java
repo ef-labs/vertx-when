@@ -7,6 +7,7 @@ import com.englishtown.promises.Value;
 import com.englishtown.vertx.promises.WhenContainer;
 import com.englishtown.vertx.promises.WhenEventBus;
 import com.englishtown.vertx.promises.WhenHttpClient;
+import com.englishtown.vertx.promises.WhenStarter;
 import com.englishtown.vertx.promises.impl.DefaultWhenContainer;
 import com.englishtown.vertx.promises.impl.DefaultWhenEventBus;
 import com.englishtown.vertx.promises.impl.DefaultWhenHttpClient;
@@ -27,6 +28,12 @@ import static org.vertx.testtools.VertxAssert.*;
  * Integration tests
  */
 public class IntegrationTest extends TestVerticle {
+
+    @Override
+    public void start() {
+        new WhenStarter(vertx).run();
+        super.start();
+    }
 
     @Test
     public void testDeployVerticle() {

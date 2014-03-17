@@ -120,3 +120,10 @@ when.all(promises).then(
 );
 
 ```
+
+
+## When.java and the Vert.x Event Loop
+
+If you want to guarantee promises resolve asynchronously, you can run `WhenStarter.run()`.  This will set the when.java nextTick Executor to run on the vert.x context.
+
+This should typically be called during `start()` in your verticle or module.

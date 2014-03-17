@@ -1,15 +1,7 @@
 package com.englishtown.vertx.hk2;
 
-import com.englishtown.vertx.promises.WhenPlatformManager;
-import com.englishtown.vertx.promises.WhenContainer;
-import com.englishtown.vertx.promises.WhenEventBus;
-import com.englishtown.vertx.promises.WhenHttpClient;
-import com.englishtown.vertx.promises.WhenHttpClientResponse;
-import com.englishtown.vertx.promises.impl.DefaultWhenPlatformManager;
-import com.englishtown.vertx.promises.impl.DefaultWhenContainer;
-import com.englishtown.vertx.promises.impl.DefaultWhenEventBus;
-import com.englishtown.vertx.promises.impl.DefaultWhenHttpClient;
-import com.englishtown.vertx.promises.impl.DefaultWhenHttpClientResponse;
+import com.englishtown.vertx.promises.*;
+import com.englishtown.vertx.promises.impl.*;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
 /**
@@ -28,6 +20,7 @@ public class WhenBinder extends AbstractBinder {
         bind(DefaultWhenEventBus.class).to(WhenEventBus.class);
         bind(DefaultWhenHttpClient.class).to(WhenHttpClient.class);
         bind(DefaultWhenHttpClientResponse.class).to(WhenHttpClientResponse.class);
+        bind(WhenStarter.class).to(WhenStarter.class);
 
     }
 }
