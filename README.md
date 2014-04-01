@@ -92,7 +92,7 @@ when.all(promises).then(
 
 ## WhenHttpClient Examples
 
-### Send to http requests
+### Send 2 http requests
 
 ```java
 
@@ -117,6 +117,29 @@ when.all(promises).then(
                 return null;
             }
         }
+);
+
+```
+
+### Get a response and body
+
+```java
+
+whenHttpClient.requestResponseBody(HttpMethod.GET.name(), URI.create("http://localhost:8888/test")).then(
+    new FulfilledRunnable<HttpClientResponseAndBody>() {
+        @Override
+        public Promise<HttpClientResponseAndBody> run(HttpClientResponseAndBody result) {
+            HttpClientResponse response = result.getResponse();
+            Buffer body = result.getBody();
+        }
+    },
+    new RejectedRunnable<HttpClientResponseAndBody>() {
+        @Override
+        public Promise<HttpClientResponseAndBody> run(Value<HttpClientResponseAndBody> value) {
+            // On fail
+            return null;
+        }
+    }
 );
 
 ```

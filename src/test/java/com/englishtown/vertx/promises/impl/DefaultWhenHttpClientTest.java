@@ -15,13 +15,17 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpClient;
 import org.vertx.java.core.http.HttpClientRequest;
 import org.vertx.java.core.http.HttpClientResponse;
+import org.vertx.java.core.streams.WriteStream;
 
+import java.lang.Runnable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,10 +48,18 @@ public class DefaultWhenHttpClientTest {
     HttpClientResponse response;
     @Captor
     ArgumentCaptor<Handler<HttpClientResponse>> handlerCaptor;
+    @Captor
+    ArgumentCaptor<Handler<Void>> endHandlerCaptor;
 
     @SuppressWarnings("unchecked")
     @Before
     public void setUp() throws Exception {
+        WhenProgress.setNextTick(new Executor() {
+            @Override
+            public void execute(Runnable command) {
+                command.run();
+            }
+        });
         when(vertx.createHttpClient()).thenReturn(client);
         when(client.request(anyString(), anyString(), any(Handler.class))).thenReturn(request);
         when(client.setHost(anyString())).thenReturn(client);
@@ -114,6 +126,19 @@ public class DefaultWhenHttpClientTest {
         }).then(done.onSuccess, done.onFail);
         verify(client).request(eq(HttpMethod.GET.name()), anyString(), handlerCaptor.capture());
         handlerCaptor.getValue().handle(response);
+        done.assertSuccess();
+    }
+
+    @Test
+    public void testRequest_with_WriteStream() throws Exception {
+        WriteStream<?> writeStream = mock(WriteStream.class);
+        when(response.statusCode()).thenReturn(HttpResponseStatus.OK.code());
+        String url = "";
+        whenHttpClient.request(HttpMethod.GET.name(), url, client, null, writeStream).then(done.onSuccess, done.onFail);
+        verify(client).request(eq(HttpMethod.GET.name()), anyString(), handlerCaptor.capture());
+        handlerCaptor.getValue().handle(response);
+        verify(response).endHandler(endHandlerCaptor.capture());
+        endHandlerCaptor.getValue().handle(null);
         done.assertSuccess();
     }
 

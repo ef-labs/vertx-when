@@ -2,6 +2,7 @@ package com.englishtown.vertx.promises.impl;
 
 import com.englishtown.promises.Done2;
 import com.englishtown.promises.Promise;
+import com.englishtown.promises.WhenProgress;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +16,7 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.PlatformManager;
 
 import java.net.URL;
+import java.util.concurrent.Executor;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -40,6 +42,12 @@ public class DefaultWhenPlatformManagerTest {
 
     @Before
     public void setUp() {
+        WhenProgress.setNextTick(new Executor() {
+            @Override
+            public void execute(Runnable command) {
+                command.run();
+            }
+        });
         defaultWhenPlatformManager = new DefaultWhenPlatformManager(manager);
     }
 

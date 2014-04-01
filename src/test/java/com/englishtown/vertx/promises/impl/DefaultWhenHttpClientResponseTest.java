@@ -3,6 +3,7 @@ package com.englishtown.vertx.promises.impl;
 import com.englishtown.promises.Done2;
 import com.englishtown.promises.Promise;
 import com.englishtown.promises.Value;
+import com.englishtown.promises.WhenProgress;
 import com.englishtown.vertx.promises.HttpClientResponseAndBody;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +15,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpClientResponse;
+
+import java.util.concurrent.Executor;
 
 import static org.mockito.Mockito.verify;
 
@@ -39,7 +42,12 @@ public class DefaultWhenHttpClientResponseTest {
 
     @Before
     public void setUp() {
-
+        WhenProgress.setNextTick(new Executor() {
+            @Override
+            public void execute(Runnable command) {
+                command.run();
+            }
+        });
     }
 
     @Test

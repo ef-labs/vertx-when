@@ -3,6 +3,7 @@ package com.englishtown.vertx.promises.impl;
 import com.englishtown.promises.Done2;
 import com.englishtown.promises.Promise;
 import com.englishtown.promises.When;
+import com.englishtown.promises.WhenProgress;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +18,7 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
 
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.*;
@@ -48,6 +50,12 @@ public class DefaultWhenContainerTest {
 
     @Before
     public void setUp() {
+        WhenProgress.setNextTick(new Executor() {
+            @Override
+            public void execute(Runnable command) {
+                command.run();
+            }
+        });
         whenContainer = new DefaultWhenContainer(container);
     }
 

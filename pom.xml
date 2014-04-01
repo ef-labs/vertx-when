@@ -18,7 +18,7 @@
 
     <properties>
         <!--Dependency versions-->
-        <vertx.version>2.1M5</vertx.version>
+        <vertx.version>2.1RC2</vertx.version>
         <when.java.version>2.0.0-SNAPSHOT</when.java.version>
         <when.java.testtools.version>2.0.0-SNAPSHOT</when.java.testtools.version>
         <vertx.mod.hk2.version>1.6.0-SNAPSHOT</vertx.mod.hk2.version>

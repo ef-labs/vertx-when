@@ -1,6 +1,7 @@
 package com.englishtown.vertx.promises.impl;
 
 import com.englishtown.promises.Done2;
+import com.englishtown.promises.WhenProgress;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +18,8 @@ import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
+
+import java.util.concurrent.Executor;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
@@ -57,6 +60,12 @@ public class DefaultWhenEventBusTest {
 
     @Before
     public void setUp() throws Exception {
+        WhenProgress.setNextTick(new Executor() {
+            @Override
+            public void execute(Runnable command) {
+                command.run();
+            }
+        });
         when(vertx.eventBus()).thenReturn(eventBus);
         whenEventBus = new DefaultWhenEventBus(vertx, container);
     }

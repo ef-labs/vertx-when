@@ -9,11 +9,20 @@ import org.vertx.java.core.http.HttpClientResponse;
 
 /**
  * Default implementation of {@link WhenHttpClientResponse}
+ *
+ * @deprecated Use {@link com.englishtown.vertx.promises.WhenHttpClient} requestResponseBody() instead.
  */
+@Deprecated
 public class DefaultWhenHttpClientResponse implements WhenHttpClientResponse {
 
     private final When<HttpClientResponseAndBody> when = new When<>();
 
+    /**
+     * @param promise
+     * @return
+     * @deprecated Use {@link com.englishtown.vertx.promises.WhenHttpClient} requestResponseBody() instead.
+     */
+    @Deprecated
     @Override
     public Promise<HttpClientResponseAndBody> body(Promise<HttpClientResponse> promise) {
 
