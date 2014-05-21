@@ -392,10 +392,10 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
 
     protected String getPath(URI url) {
         final StringBuilder path = new StringBuilder();
-        path.append(url.getPath());
+        path.append(url.getRawPath());
         if (url.getQuery() != null && url.getQuery().length() > 0) {
             path.append("?");
-            path.append(url.getQuery());
+            path.append(url.getRawQuery());
         }
 
         return path.toString();
