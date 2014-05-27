@@ -1,5 +1,5 @@
 {
-    "includes": "com.englishtown~vertx-mod-hk2~1.6.0-SNAPSHOT",
+    "includes": "com.englishtown~vertx-mod-hk2~1.6.0",
     "description":"Provides when.java wrappers for standard vert.x objects to return promises.",
     "licenses": ["The MIT License"],
     "author": "Englishtown",

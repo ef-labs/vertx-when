@@ -7,7 +7,7 @@
     <parent>
         <artifactId>oss-parent-vertx</artifactId>
         <groupId>com.englishtown</groupId>
-        <version>1.4.0-SNAPSHOT</version>
+        <version>1.4.0</version>
     </parent>
 
     <packaging>jar</packaging>
@@ -18,10 +18,10 @@
 
     <properties>
         <!--Dependency versions-->
-        <vertx.version>2.1RC2</vertx.version>
-        <when.java.version>2.0.0-SNAPSHOT</when.java.version>
-        <when.java.testtools.version>2.0.0-SNAPSHOT</when.java.testtools.version>
-        <vertx.mod.hk2.version>1.6.0-SNAPSHOT</vertx.mod.hk2.version>
+        <vertx.version>2.1</vertx.version>
+        <when.java.version>2.0.0</when.java.version>
+        <when.java.testtools.version>2.0.0</when.java.testtools.version>
+        <vertx.mod.hk2.version>1.6.0</vertx.mod.hk2.version>
         <java.inject.version>1</java.inject.version>
     </properties>
 
