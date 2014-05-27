@@ -7,10 +7,13 @@ import com.englishtown.promises.When;
 import com.englishtown.vertx.promises.WhenContainer;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Default implementation of {@link WhenContainer}
@@ -18,7 +21,7 @@ import javax.inject.Inject;
 public class DefaultWhenContainer implements WhenContainer {
 
     private final Container container;
-    private final When<String, Void> when = new When<>();
+    private final When<String> when = new When<>();
 
     @Inject
     public DefaultWhenContainer(Container container) {
@@ -31,7 +34,7 @@ public class DefaultWhenContainer implements WhenContainer {
      * @param main The main of the verticle
      */
     @Override
-    public Promise<String, Void> deployVerticle(String main) {
+    public Promise<String> deployVerticle(String main) {
         return deployVerticle(main, null, 1);
     }
 
@@ -42,7 +45,7 @@ public class DefaultWhenContainer implements WhenContainer {
      * @param config JSON config to provide to the verticle
      */
     @Override
-    public Promise<String, Void> deployVerticle(String main, JsonObject config) {
+    public Promise<String> deployVerticle(String main, JsonObject config) {
         return deployVerticle(main, config, 1);
     }
 
@@ -53,7 +56,7 @@ public class DefaultWhenContainer implements WhenContainer {
      * @param instances The number of instances to deploy (defaults to 1)
      */
     @Override
-    public Promise<String, Void> deployVerticle(String main, int instances) {
+    public Promise<String> deployVerticle(String main, int instances) {
         return deployVerticle(main, null, instances);
     }
 
@@ -65,8 +68,8 @@ public class DefaultWhenContainer implements WhenContainer {
      * @param instances The number of instances to deploy (defaults to 1)
      */
     @Override
-    public Promise<String, Void> deployVerticle(String main, JsonObject config, int instances) {
-        final Deferred<String, Void> d = when.defer();
+    public Promise<String> deployVerticle(String main, JsonObject config, int instances) {
+        final Deferred<String> d = when.defer();
 
         container.deployVerticle(main, config, instances, new Handler<AsyncResult<String>>() {
             @Override
@@ -88,7 +91,7 @@ public class DefaultWhenContainer implements WhenContainer {
      * @param moduleName The main of the module to deploy
      */
     @Override
-    public Promise<String, Void> deployModule(String moduleName) {
+    public Promise<String> deployModule(String moduleName) {
         return deployModule(moduleName, null, 1);
     }
 
@@ -99,7 +102,7 @@ public class DefaultWhenContainer implements WhenContainer {
      * @param config     JSON config to provide to the module
      */
     @Override
-    public Promise<String, Void> deployModule(String moduleName, JsonObject config) {
+    public Promise<String> deployModule(String moduleName, JsonObject config) {
         return deployModule(moduleName, config, 1);
     }
 
@@ -110,7 +113,7 @@ public class DefaultWhenContainer implements WhenContainer {
      * @param instances  The number of instances to deploy (defaults to 1)
      */
     @Override
-    public Promise<String, Void> deployModule(String moduleName, int instances) {
+    public Promise<String> deployModule(String moduleName, int instances) {
         return deployModule(moduleName, null, instances);
     }
 
@@ -122,8 +125,8 @@ public class DefaultWhenContainer implements WhenContainer {
      * @param instances  The number of instances to deploy (defaults to 1)
      */
     @Override
-    public Promise<String, Void> deployModule(String moduleName, JsonObject config, int instances) {
-        final Deferred<String, Void> d = when.defer();
+    public Promise<String> deployModule(String moduleName, JsonObject config, int instances) {
+        final Deferred<String> d = when.defer();
 
         container.deployModule(moduleName, config, instances, new Handler<AsyncResult<String>>() {
             @Override
@@ -146,7 +149,7 @@ public class DefaultWhenContainer implements WhenContainer {
      * @param multiThreaded if true then the verticle will be deployed as a multi-threaded worker
      */
     @Override
-    public Promise<String, Void> deployWorkerVerticle(String main, boolean multiThreaded) {
+    public Promise<String> deployWorkerVerticle(String main, boolean multiThreaded) {
         return deployWorkerVerticle(main, null, 1, multiThreaded);
     }
 
@@ -158,7 +161,7 @@ public class DefaultWhenContainer implements WhenContainer {
      * @param multiThreaded if true then the verticle will be deployed as a multi-threaded worker
      */
     @Override
-    public Promise<String, Void> deployWorkerVerticle(String main, JsonObject config, boolean multiThreaded) {
+    public Promise<String> deployWorkerVerticle(String main, JsonObject config, boolean multiThreaded) {
         return deployWorkerVerticle(main, config, 1, multiThreaded);
     }
 
@@ -170,7 +173,7 @@ public class DefaultWhenContainer implements WhenContainer {
      * @param multiThreaded if true then the verticle will be deployed as a multi-threaded worker
      */
     @Override
-    public Promise<String, Void> deployWorkerVerticle(String main, int instances, boolean multiThreaded) {
+    public Promise<String> deployWorkerVerticle(String main, int instances, boolean multiThreaded) {
         return deployWorkerVerticle(main, null, instances, multiThreaded);
     }
 
@@ -183,8 +186,8 @@ public class DefaultWhenContainer implements WhenContainer {
      * @param multiThreaded if true then the verticle will be deployed as a multi-threaded worker
      */
     @Override
-    public Promise<String, Void> deployWorkerVerticle(String main, JsonObject config, int instances, boolean multiThreaded) {
-        final Deferred<String, Void> d = when.defer();
+    public Promise<String> deployWorkerVerticle(String main, JsonObject config, int instances, boolean multiThreaded) {
+        final Deferred<String> d = when.defer();
 
         container.deployWorkerVerticle(main, config, instances, multiThreaded, new Handler<AsyncResult<String>>() {
             @Override
@@ -200,9 +203,84 @@ public class DefaultWhenContainer implements WhenContainer {
         return d.getPromise();
     }
 
-    protected void reject(Deferred<String, Void> d, String result, Throwable t) {
-        RuntimeException e = (t == null || t instanceof RuntimeException ? (RuntimeException) t : new RuntimeException(t));
-        d.getResolver().reject(new Value<>(result, e));
+    /**
+     * Undeploy a verticle
+     *
+     * @param deploymentID The deployment ID
+     */
+    @Override
+    public Promise<Void> undeployVerticle(String deploymentID) {
+        final Deferred<Void> d = new When<Void>().defer();
+        container.undeployVerticle(deploymentID, new Handler<AsyncResult<Void>>() {
+            @Override
+            public void handle(AsyncResult<Void> result) {
+                if (result.succeeded()) {
+                    d.getResolver().resolve((Void) null);
+                } else {
+                    d.getResolver().reject(result.cause());
+                }
+            }
+        });
+        return d.getPromise();
+    }
+
+    /**
+     * Undeploy a module
+     *
+     * @param deploymentID The deployment ID
+     */
+    @Override
+    public Promise<Void> undeployModule(String deploymentID) {
+        final Deferred<Void> d = new When<Void>().defer();
+        container.undeployModule(deploymentID, new Handler<AsyncResult<Void>>() {
+            @Override
+            public void handle(AsyncResult<Void> result) {
+                if (result.succeeded()) {
+                    d.getResolver().resolve((Void) null);
+                } else {
+                    d.getResolver().reject(result.cause());
+                }
+            }
+        });
+        return d.getPromise();
+
+    }
+
+    /**
+     * Deploys one or more modules.  The Json is of the structure:
+     * [ {
+     * "name": "groupId~artifactId~version",
+     * "instances": 1,
+     * "config": {}
+     * } ]
+     *
+     * @param modules
+     * @return
+     */
+    @Override
+    public List<Promise<String>> deployModules(JsonArray modules) {
+        List<Promise<String>> promises = new ArrayList<>();
+
+        if (modules == null) {
+            return promises;
+        }
+
+        for (int i = 0; i < modules.size(); i++) {
+            JsonObject module = modules.get(i);
+            String name = module.getString("name");
+
+            if (name != null && !name.isEmpty()) {
+                int instances = module.getInteger("instances", 1);
+                JsonObject config = module.getObject("config", new JsonObject());
+                promises.add(deployModule(name, config, instances));
+            }
+        }
+
+        return promises;
+    }
+
+    protected void reject(Deferred<String> d, String result, Throwable t) {
+        d.getResolver().reject(new Value<>(result, t));
     }
 
 }

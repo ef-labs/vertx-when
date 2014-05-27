@@ -2,6 +2,8 @@ package com.englishtown.vertx.promises.impl;
 
 import com.englishtown.promises.Done2;
 import com.englishtown.promises.Promise;
+import com.englishtown.promises.When;
+import com.englishtown.promises.WhenProgress;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,40 +13,49 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.List;
+import java.util.concurrent.Executor;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 7/26/13
- * Time: 5:26 PM
- * To change this template use File | Settings | File Templates.
+ * Unit tests for {@link DefaultWhenContainer}
  */
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultWhenContainerTest {
 
     private DefaultWhenContainer whenContainer;
-    private Promise<String, Void> promise;
+    private Promise<String> promise;
     private Done2<String> done = new Done2<>();
 
     @Mock
     Container container;
     @Mock
     AsyncResult<String> result;
+    @Mock
+    AsyncResult<Void> voidResult;
     @Captor
     ArgumentCaptor<Handler<AsyncResult<String>>> handlerCaptor;
+    @Captor
+    ArgumentCaptor<Handler<AsyncResult<Void>>> voidHandlerCaptor;
 
     String main = "com.englishtown.test.Verticle";
     String moduleName = "com.englishtown~vertx-mod-when~1.1.0-final";
 
     @Before
     public void setUp() {
+        WhenProgress.setNextTick(new Executor() {
+            @Override
+            public void execute(Runnable command) {
+                command.run();
+            }
+        });
         whenContainer = new DefaultWhenContainer(container);
     }
 
@@ -286,6 +297,86 @@ public class DefaultWhenContainerTest {
 
         promise.then(done.onSuccess, done.onFail);
         done.assertFailed();
+    }
+
+    @Test
+    public void testUndeployVerticle() throws Exception {
+        String deploymentID = "id";
+        Done2<Void> done = new Done2<>();
+        when(voidResult.succeeded()).thenReturn(true);
+
+        whenContainer.undeployVerticle(deploymentID).then(done.onSuccess, done.onFail);
+        verify(container).undeployVerticle(eq(deploymentID), voidHandlerCaptor.capture());
+
+        voidHandlerCaptor.getValue().handle(voidResult);
+        done.assertSuccess();
+    }
+
+    @Test
+    public void testUndeployVerticle_Fail() throws Exception {
+        String deploymentID = "id";
+        Done2<Void> done = new Done2<>();
+
+        whenContainer.undeployVerticle(deploymentID).then(done.onSuccess, done.onFail);
+        verify(container).undeployVerticle(eq(deploymentID), voidHandlerCaptor.capture());
+
+        voidHandlerCaptor.getValue().handle(voidResult);
+        done.assertFailed();
+    }
+
+    @Test
+    public void testUndeployModule() throws Exception {
+        String deploymentID = "id";
+        Done2<Void> done = new Done2<>();
+        when(voidResult.succeeded()).thenReturn(true);
+
+        whenContainer.undeployModule(deploymentID).then(done.onSuccess, done.onFail);
+        verify(container).undeployModule(eq(deploymentID), voidHandlerCaptor.capture());
+
+        voidHandlerCaptor.getValue().handle(voidResult);
+        done.assertSuccess();
+    }
+
+    @Test
+    public void testUndeployModule_Fail() throws Exception {
+        String deploymentID = "id";
+        Done2<Void> done = new Done2<>();
+
+        whenContainer.undeployModule(deploymentID).then(done.onSuccess, done.onFail);
+        verify(container).undeployModule(eq(deploymentID), voidHandlerCaptor.capture());
+
+        voidHandlerCaptor.getValue().handle(voidResult);
+        done.assertFailed();
+    }
+
+    @Test
+    public void testDeployModules() throws Exception {
+
+        JsonArray modules = new JsonArray()
+                .add(new JsonObject()
+                        .putString("name", "com.englishtown~mod1~1.0")
+                        .putNumber("instances", 2)
+                        .putObject("config", new JsonObject().putString("test", "value"))
+                )
+                .add(new JsonObject()
+                        .putString("name", "com.englishtown~mod2~1.0"))
+                .add(new JsonObject());
+
+        List<Promise<String>> promises = whenContainer.deployModules(modules);
+
+        assertEquals(2, promises.size());
+        verify(container, times(2)).deployModule(anyString(), any(JsonObject.class), anyInt(), handlerCaptor.capture());
+
+    }
+
+    @Test
+    public void testDeployModules_Null() throws Exception {
+
+        List<Promise<String>> promises = whenContainer.deployModules(null);
+
+        assertEquals(0, promises.size());
+        verifyZeroInteractions(container);
+
     }
 
 }

@@ -1,7 +1,10 @@
 package com.englishtown.vertx.promises;
 
 import com.englishtown.promises.Promise;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
+
+import java.util.List;
 
 /**
  * When.java wrapper over a vert.x {@link org.vertx.java.platform.Container}
@@ -13,7 +16,7 @@ public interface WhenContainer {
      *
      * @param main The main of the verticle
      */
-    Promise<String, Void> deployVerticle(String main);
+    Promise<String> deployVerticle(String main);
 
     /**
      * Deploy a verticle programmatically
@@ -21,7 +24,7 @@ public interface WhenContainer {
      * @param main   The main of the verticle
      * @param config JSON config to provide to the verticle
      */
-    Promise<String, Void> deployVerticle(String main, JsonObject config);
+    Promise<String> deployVerticle(String main, JsonObject config);
 
     /**
      * Deploy a verticle programmatically
@@ -29,7 +32,7 @@ public interface WhenContainer {
      * @param main      The main of the verticle
      * @param instances The number of instances to deploy (defaults to 1)
      */
-    Promise<String, Void> deployVerticle(String main, int instances);
+    Promise<String> deployVerticle(String main, int instances);
 
     /**
      * Deploy a verticle programmatically
@@ -38,14 +41,14 @@ public interface WhenContainer {
      * @param config    JSON config to provide to the verticle
      * @param instances The number of instances to deploy (defaults to 1)
      */
-    Promise<String, Void> deployVerticle(String main, JsonObject config, int instances);
+    Promise<String> deployVerticle(String main, JsonObject config, int instances);
 
     /**
      * Deploy a module programmatically
      *
      * @param moduleName The main of the module to deploy
      */
-    Promise<String, Void> deployModule(String moduleName);
+    Promise<String> deployModule(String moduleName);
 
     /**
      * Deploy a module programmatically
@@ -53,7 +56,7 @@ public interface WhenContainer {
      * @param moduleName The main of the module to deploy
      * @param config     JSON config to provide to the module
      */
-    Promise<String, Void> deployModule(String moduleName, JsonObject config);
+    Promise<String> deployModule(String moduleName, JsonObject config);
 
     /**
      * Deploy a module programmatically
@@ -61,7 +64,7 @@ public interface WhenContainer {
      * @param moduleName The main of the module to deploy
      * @param instances  The number of instances to deploy (defaults to 1)
      */
-    Promise<String, Void> deployModule(String moduleName, int instances);
+    Promise<String> deployModule(String moduleName, int instances);
 
     /**
      * Deploy a module programmatically
@@ -70,7 +73,7 @@ public interface WhenContainer {
      * @param config     JSON config to provide to the module
      * @param instances  The number of instances to deploy (defaults to 1)
      */
-    Promise<String, Void> deployModule(String moduleName, JsonObject config, int instances);
+    Promise<String> deployModule(String moduleName, JsonObject config, int instances);
 
     /**
      * Deploy a worker verticle programmatically
@@ -78,7 +81,7 @@ public interface WhenContainer {
      * @param main          The main of the verticle
      * @param multiThreaded if true then the verticle will be deployed as a multi-threaded worker
      */
-    Promise<String, Void> deployWorkerVerticle(String main, boolean multiThreaded);
+    Promise<String> deployWorkerVerticle(String main, boolean multiThreaded);
 
     /**
      * Deploy a worker verticle programmatically
@@ -87,7 +90,7 @@ public interface WhenContainer {
      * @param config        JSON config to provide to the verticle
      * @param multiThreaded if true then the verticle will be deployed as a multi-threaded worker
      */
-    Promise<String, Void> deployWorkerVerticle(String main, JsonObject config, boolean multiThreaded);
+    Promise<String> deployWorkerVerticle(String main, JsonObject config, boolean multiThreaded);
 
     /**
      * Deploy a worker verticle programmatically
@@ -96,7 +99,7 @@ public interface WhenContainer {
      * @param instances     The number of instances to deploy (defaults to 1)
      * @param multiThreaded if true then the verticle will be deployed as a multi-threaded worker
      */
-    Promise<String, Void> deployWorkerVerticle(String main, int instances, boolean multiThreaded);
+    Promise<String> deployWorkerVerticle(String main, int instances, boolean multiThreaded);
 
     /**
      * Deploy a worker verticle programmatically
@@ -106,6 +109,33 @@ public interface WhenContainer {
      * @param instances     The number of instances to deploy (defaults to 1)
      * @param multiThreaded if true then the verticle will be deployed as a multi-threaded worker
      */
-    Promise<String, Void> deployWorkerVerticle(String main, JsonObject config, int instances, boolean multiThreaded);
+    Promise<String> deployWorkerVerticle(String main, JsonObject config, int instances, boolean multiThreaded);
+
+    /**
+     * Undeploy a verticle
+     *
+     * @param deploymentID The deployment ID
+     */
+    Promise<Void> undeployVerticle(String deploymentID);
+
+    /**
+     * Undeploy a module
+     *
+     * @param deploymentID The deployment ID
+     */
+    Promise<Void> undeployModule(String deploymentID);
+
+    /**
+     * Deploys one or more modules.  The Json is of the structure:
+     * [ {
+     * "name": "groupId~artifactId~version",
+     * "instances": 1,
+     * "config": {}
+     * } ]
+     *
+     * @param modules
+     * @return
+     */
+    List<Promise<String>> deployModules(JsonArray modules);
 
 }

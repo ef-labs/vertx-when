@@ -11,16 +11,16 @@ Provides when.java wrappers for standard vert.x objects to return promises.
 
 whenContainer.deployVerticle("com.englishtown.vertx.TestVerticle")
     .then(
-            new Runnable<Promise<String, Void>, String>() {
+            new FulfilledRunnable<String>() {
                 @Override
-                public Promise<String, Void> run(String value) {
+                public Promise<String> run(String value) {
                     // On success
                     return null;
                 }
             },
-            new Runnable<Promise<String, Void>, Value<String>>() {
+            new RejectedRunnable<String>() {
                 @Override
-                public Promise<String, Void> run(Value<String> value) {
+                public Promise<String> run(Value<String> value) {
                     // On fail
                     return null;
                 }
@@ -40,16 +40,16 @@ promises.add(whenContainer.deployModule("com.englishtown~vertx-mod-hk2~1.5.0-fin
 promises.add(whenContainer.deployModule("com.englishtown~vertx-mod-jersey~2.3.0-final"));
 
 when.all(promises,
-        new Runnable<Promise<List<String>, Void>, List<String>>() {
+        new FulfilledRunnable<List<String>>() {
             @Override
-            public Promise<List<String>, Void> run(List<String> value) {
+            public Promise<List<String>> run(List<String> value) {
                 // On success
                 return null;
             }
         },
-        new Runnable<Promise<List<String>, Void>, Value<List<String>>>() {
+        new RejectedRunnable<List<String>>() {
             @Override
-            public Promise<List<String>, Void> run(Value<List<String>> value) {
+            public Promise<List<String>> run(Value<List<String>> value) {
                 // On fail
                 return null;
             }
@@ -71,17 +71,17 @@ When<Message<JsonObject>, Void> when = new When<>();
 promises.add(whenEventBus.<JsonObject>send("et.vertx.eb.1", new JsonObject().putString("message", "hello")));
 promises.add(whenEventBus.<JsonObject>send("et.vertx.eb.2", new JsonObject().putString("message", "world")));
 
-when.all(promises,
-        new Runnable<Promise<List<Message<JsonObject>>, Void>, List<Message<JsonObject>>>() {
+when.all(promises).then(
+        new FulfilledRunnable<List<Message<JsonObject>>>() {
             @Override
-            public Promise<List<Message<JsonObject>>, Void> run(List<Message<JsonObject>> value) {
+            public Promise<List<Message<JsonObject>>> run(List<Message<JsonObject>> value) {
                 // On success
                 return null;
             }
         },
-        new Runnable<Promise<List<Message<JsonObject>>, Void>, Value<List<Message<JsonObject>>>>() {
+        new RejectedRunnable<List<Message<JsonObject>>>, Value<List<Message<JsonObject>>>>() {
             @Override
-            public Promise<List<Message<JsonObject>>, Void> run(Value<List<Message<JsonObject>>> value) {
+            public Promise<List<Message<JsonObject>>> run(Value<List<Message<JsonObject>>> value) {
                 // On fail
                 return null;
             }
@@ -92,7 +92,7 @@ when.all(promises,
 
 ## WhenHttpClient Examples
 
-### Send to http requests
+### Send 2 http requests
 
 ```java
 
@@ -102,17 +102,17 @@ When<HttpClientResponse, Void> when = new When<>();
 promises.add(whenHttpClient.request(HttpMethod.GET.name(), URI.create("http://test.englishtown.com/test1")));
 promises.add(whenHttpClient.request(HttpMethod.POST.name(), URI.create("http://test.englishtown.com/test2")));
 
-when.all(promises,
-        new Runnable<Promise<List<HttpClientResponse>, Void>, List<HttpClientResponse>>() {
+when.all(promises).then(
+        new FulfilledRunnable<List<HttpClientResponse>>() {
             @Override
-            public Promise<List<HttpClientResponse>, Void> run(List<HttpClientResponse> value) {
+            public Promise<List<HttpClientResponse>> run(List<HttpClientResponse> value) {
                 // On success
                 return null;
             }
         },
-        new Runnable<Promise<List<HttpClientResponse>, Void>, Value<List<HttpClientResponse>>>() {
+        new RejectedRunnable<List<HttpClientResponse>>() {
             @Override
-            public Promise<List<HttpClientResponse>, Void> run(Value<List<HttpClientResponse>> value) {
+            public Promise<List<HttpClientResponse>> run(Value<List<HttpClientResponse>> value) {
                 // On fail
                 return null;
             }
@@ -120,3 +120,33 @@ when.all(promises,
 );
 
 ```
+
+### Get a response and body
+
+```java
+
+whenHttpClient.requestResponseBody(HttpMethod.GET.name(), URI.create("http://localhost:8888/test")).then(
+    new FulfilledRunnable<HttpClientResponseAndBody>() {
+        @Override
+        public Promise<HttpClientResponseAndBody> run(HttpClientResponseAndBody result) {
+            HttpClientResponse response = result.getResponse();
+            Buffer body = result.getBody();
+        }
+    },
+    new RejectedRunnable<HttpClientResponseAndBody>() {
+        @Override
+        public Promise<HttpClientResponseAndBody> run(Value<HttpClientResponseAndBody> value) {
+            // On fail
+            return null;
+        }
+    }
+);
+
+```
+
+
+## When.java and the Vert.x Event Loop
+
+If you want to guarantee promises resolve asynchronously, you can run `WhenStarter.run()`.  This will set the when.java nextTick Executor to run on the vert.x context.
+
+This should typically be called during `start()` in your verticle or module.

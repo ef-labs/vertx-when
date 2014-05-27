@@ -2,6 +2,7 @@ package com.englishtown.vertx.promises.impl;
 
 import com.englishtown.promises.Done2;
 import com.englishtown.promises.Promise;
+import com.englishtown.promises.WhenProgress;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,10 +13,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Container;
 import org.vertx.java.platform.PlatformManager;
 
 import java.net.URL;
+import java.util.concurrent.Executor;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -26,11 +27,11 @@ import static org.mockito.Mockito.when;
 public class DefaultWhenPlatformManagerTest {
 
     private DefaultWhenPlatformManager defaultWhenPlatformManager;
-    private Promise<String, Void> promise;
+    private Promise<String> promise;
     private Done2<String> done = new Done2<>();
 
     @Mock
-	PlatformManager manager;
+    PlatformManager manager;
     @Mock
     AsyncResult<String> result;
     @Captor
@@ -41,6 +42,12 @@ public class DefaultWhenPlatformManagerTest {
 
     @Before
     public void setUp() {
+        WhenProgress.setNextTick(new Executor() {
+            @Override
+            public void execute(Runnable command) {
+                command.run();
+            }
+        });
         defaultWhenPlatformManager = new DefaultWhenPlatformManager(manager);
     }
 

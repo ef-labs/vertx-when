@@ -1,11 +1,7 @@
 package com.englishtown.vertx.promises.integration;
 
-import com.englishtown.promises.Promise;
-import com.englishtown.promises.Runnable;
-import com.englishtown.promises.Value;
-import com.englishtown.vertx.promises.WhenContainer;
-import com.englishtown.vertx.promises.WhenEventBus;
-import com.englishtown.vertx.promises.WhenHttpClient;
+import com.englishtown.promises.*;
+import com.englishtown.vertx.promises.*;
 import com.englishtown.vertx.promises.impl.DefaultWhenContainer;
 import com.englishtown.vertx.promises.impl.DefaultWhenEventBus;
 import com.englishtown.vertx.promises.impl.DefaultWhenHttpClient;
@@ -13,29 +9,28 @@ import io.netty.handler.codec.http.HttpMethod;
 import org.junit.Test;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.http.HttpClientResponse;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.testtools.TestVerticle;
 
+import java.lang.Runnable;
 import java.net.URI;
+import java.util.concurrent.Executor;
 
-import static org.vertx.testtools.VertxAssert.assertEquals;
-import static org.vertx.testtools.VertxAssert.fail;
-import static org.vertx.testtools.VertxAssert.testComplete;
+import static org.vertx.testtools.VertxAssert.*;
 
 /**
  * Integration tests
  */
-//@RunWith(CPJavaClassRunner.class)
 public class IntegrationTest extends TestVerticle {
 
-//    private WhenContainer whenContainer;
-//    private ;
-//    private WhenHttpClient whenHttpClient;
-//    whenContainer = new DefaultWhenContainer(container);
-//    whenHttpClient = new DefaultWhenHttpClient(vertx);
-
+    @Override
+    public void start() {
+        new WhenStarter(vertx).run();
+        super.start();
+    }
 
     @Test
     public void testDeployVerticle() {
@@ -43,16 +38,16 @@ public class IntegrationTest extends TestVerticle {
         WhenContainer whenContainer = new DefaultWhenContainer(container);
 
         whenContainer.deployVerticle(com.englishtown.vertx.promises.integration.TestVerticle.class.getName()).then(
-                new Runnable<Promise<String, Void>, String>() {
+                new FulfilledRunnable<String>() {
                     @Override
-                    public Promise<String, Void> run(String value) {
+                    public Promise<String> run(String value) {
                         testComplete();
                         return null;
                     }
                 },
-                new Runnable<Promise<String, Void>, Value<String>>() {
+                new RejectedRunnable<String>() {
                     @Override
-                    public Promise<String, Void> run(Value<String> value) {
+                    public Promise<String> run(Value<String> value) {
                         fail();
                         return null;
                     }
@@ -71,16 +66,16 @@ public class IntegrationTest extends TestVerticle {
             public void handle(AsyncResult<String> result) {
                 if (result.succeeded()) {
                     whenEventBus.send(EventBusVerticle.ADDRESS, new JsonObject()).then(
-                            new Runnable<Promise<Message<Object>, Void>, Message<Object>>() {
+                            new FulfilledRunnable<Message<Object>>() {
                                 @Override
-                                public Promise<Message<Object>, Void> run(Message<Object> value) {
+                                public Promise<Message<Object>> run(Message<Object> value) {
                                     testComplete();
                                     return null;
                                 }
                             },
-                            new Runnable<Promise<Message<Object>, Void>, Value<Message<Object>>>() {
+                            new RejectedRunnable<Message<Object>>() {
                                 @Override
-                                public Promise<Message<Object>, Void> run(Value<Message<Object>> value) {
+                                public Promise<Message<Object>> run(Value<Message<Object>> value) {
                                     fail();
                                     return null;
                                 }
@@ -103,17 +98,17 @@ public class IntegrationTest extends TestVerticle {
             public void handle(AsyncResult<String> result) {
                 if (result.succeeded()) {
                     whenHttpClient.request(HttpMethod.GET.name(), URI.create("http://localhost:8888/test")).then(
-                            new Runnable<Promise<HttpClientResponse, Void>, HttpClientResponse>() {
+                            new FulfilledRunnable<HttpClientResponse>() {
                                 @Override
-                                public Promise<HttpClientResponse, Void> run(HttpClientResponse response) {
+                                public Promise<HttpClientResponse> run(HttpClientResponse response) {
                                     assertEquals(200, response.statusCode());
                                     testComplete();
                                     return null;
                                 }
                             },
-                            new Runnable<Promise<HttpClientResponse, Void>, Value<HttpClientResponse>>() {
+                            new RejectedRunnable<HttpClientResponse>() {
                                 @Override
-                                public Promise<HttpClientResponse, Void> run(Value<HttpClientResponse> value) {
+                                public Promise<HttpClientResponse> run(Value<HttpClientResponse> value) {
                                     fail();
                                     return null;
                                 }
@@ -126,10 +121,47 @@ public class IntegrationTest extends TestVerticle {
         });
     }
 
-    @Override
-    public void start() {
+    @Test
+    public void testHttpRequestResponseBody() {
 
+        final WhenHttpClient whenHttpClient = new DefaultWhenHttpClient(vertx);
 
-        super.start();
+        container.deployVerticle(HttpServerVerticle.class.getName(), new Handler<AsyncResult<String>>() {
+            @Override
+            public void handle(AsyncResult<String> result) {
+                if (result.succeeded()) {
+
+                    whenHttpClient.requestResponseBody(HttpMethod.GET.name(), URI.create("http://localhost:8888/test")).then(
+                            new FulfilledRunnable<HttpClientResponseAndBody>() {
+                                @Override
+                                public Promise<HttpClientResponseAndBody> run(HttpClientResponseAndBody result) {
+                                    HttpClientResponse response = result.getResponse();
+                                    Buffer body = result.getBody();
+
+                                    assertNotNull(response);
+                                    assertEquals(200, response.statusCode());
+
+                                    assertNotNull(body);
+                                    JsonObject json = new JsonObject(body.toString());
+                                    assertNotNull(json);
+
+                                    testComplete();
+                                    return null;
+                                }
+                            },
+                            new RejectedRunnable<HttpClientResponseAndBody>() {
+                                @Override
+                                public Promise<HttpClientResponseAndBody> run(Value<HttpClientResponseAndBody> value) {
+                                    fail();
+                                    return null;
+                                }
+                            }
+                    );
+                } else {
+                    fail();
+                }
+            }
+        });
     }
+
 }

@@ -1,7 +1,6 @@
 package com.englishtown.vertx.promises.impl;
 
 import com.englishtown.promises.*;
-import com.englishtown.promises.Runnable;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Before;
@@ -16,13 +15,17 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpClient;
 import org.vertx.java.core.http.HttpClientRequest;
 import org.vertx.java.core.http.HttpClientResponse;
+import org.vertx.java.core.streams.WriteStream;
 
+import java.lang.Runnable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,9 +48,18 @@ public class DefaultWhenHttpClientTest {
     HttpClientResponse response;
     @Captor
     ArgumentCaptor<Handler<HttpClientResponse>> handlerCaptor;
+    @Captor
+    ArgumentCaptor<Handler<Void>> endHandlerCaptor;
 
+    @SuppressWarnings("unchecked")
     @Before
     public void setUp() throws Exception {
+        WhenProgress.setNextTick(new Executor() {
+            @Override
+            public void execute(Runnable command) {
+                command.run();
+            }
+        });
         when(vertx.createHttpClient()).thenReturn(client);
         when(client.request(anyString(), anyString(), any(Handler.class))).thenReturn(request);
         when(client.setHost(anyString())).thenReturn(client);
@@ -117,25 +129,38 @@ public class DefaultWhenHttpClientTest {
         done.assertSuccess();
     }
 
+    @Test
+    public void testRequest_with_WriteStream() throws Exception {
+        WriteStream<?> writeStream = mock(WriteStream.class);
+        when(response.statusCode()).thenReturn(HttpResponseStatus.OK.code());
+        String url = "";
+        whenHttpClient.request(HttpMethod.GET.name(), url, client, null, writeStream).then(done.onSuccess, done.onFail);
+        verify(client).request(eq(HttpMethod.GET.name()), anyString(), handlerCaptor.capture());
+        handlerCaptor.getValue().handle(response);
+        verify(response).endHandler(endHandlerCaptor.capture());
+        endHandlerCaptor.getValue().handle(null);
+        done.assertSuccess();
+    }
+
     public void test() {
 
-        List<Promise<HttpClientResponse, Void>> promises = new ArrayList<>();
-        When<HttpClientResponse, Void> when = new When<>();
+        List<Promise<HttpClientResponse>> promises = new ArrayList<>();
+        When<HttpClientResponse> when = new When<>();
 
         promises.add(whenHttpClient.request(HttpMethod.GET.name(), URI.create("http://test.englishtown.com/test1")));
         promises.add(whenHttpClient.request(HttpMethod.POST.name(), URI.create("http://test.englishtown.com/test2")));
 
-        when.all(promises,
-                new Runnable<Promise<List<HttpClientResponse>, Void>, List<HttpClientResponse>>() {
+        when.all(promises).then(
+                new FulfilledRunnable<List<? extends HttpClientResponse>>() {
                     @Override
-                    public Promise<List<HttpClientResponse>, Void> run(List<HttpClientResponse> value) {
+                    public Promise<List<? extends HttpClientResponse>> run(List<? extends HttpClientResponse> value) {
                         // On success
                         return null;
                     }
                 },
-                new Runnable<Promise<List<HttpClientResponse>, Void>, Value<List<HttpClientResponse>>>() {
+                new RejectedRunnable<List<? extends HttpClientResponse>>() {
                     @Override
-                    public Promise<List<HttpClientResponse>, Void> run(Value<List<HttpClientResponse>> value) {
+                    public Promise<List<? extends HttpClientResponse>> run(Value<List<? extends HttpClientResponse>> value) {
                         // On fail
                         return null;
                     }
