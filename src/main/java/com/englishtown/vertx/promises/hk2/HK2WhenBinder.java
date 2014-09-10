@@ -23,7 +23,7 @@ public class HK2WhenBinder extends AbstractBinder {
 
         install(new com.englishtown.promises.hk2.WhenBinder());
 
-        bind(VertxExecutor.class).to(Executor.class).in(Singleton.class);
+        bind(VertxExecutor.class).to(Executor.class).in(Singleton.class).ranked(10);
 
         bind(DefaultWhenPlatformManager.class).to(WhenPlatformManager.class);
         bind(DefaultWhenContainer.class).to(WhenContainer.class);
