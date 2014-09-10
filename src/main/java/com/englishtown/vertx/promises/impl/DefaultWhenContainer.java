@@ -2,11 +2,8 @@ package com.englishtown.vertx.promises.impl;
 
 import com.englishtown.promises.Deferred;
 import com.englishtown.promises.Promise;
-import com.englishtown.promises.Value;
 import com.englishtown.promises.When;
 import com.englishtown.vertx.promises.WhenContainer;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
@@ -21,11 +18,12 @@ import java.util.List;
 public class DefaultWhenContainer implements WhenContainer {
 
     private final Container container;
-    private final When<String> when = new When<>();
+    private final When when;
 
     @Inject
-    public DefaultWhenContainer(Container container) {
+    public DefaultWhenContainer(Container container, When when) {
         this.container = container;
+        this.when = when;
     }
 
     /**
@@ -71,14 +69,11 @@ public class DefaultWhenContainer implements WhenContainer {
     public Promise<String> deployVerticle(String main, JsonObject config, int instances) {
         final Deferred<String> d = when.defer();
 
-        container.deployVerticle(main, config, instances, new Handler<AsyncResult<String>>() {
-            @Override
-            public void handle(AsyncResult<String> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    reject(d, result.result(), result.cause());
-                }
+        container.deployVerticle(main, config, instances, result -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
 
@@ -128,14 +123,11 @@ public class DefaultWhenContainer implements WhenContainer {
     public Promise<String> deployModule(String moduleName, JsonObject config, int instances) {
         final Deferred<String> d = when.defer();
 
-        container.deployModule(moduleName, config, instances, new Handler<AsyncResult<String>>() {
-            @Override
-            public void handle(AsyncResult<String> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    reject(d, result.result(), result.cause());
-                }
+        container.deployModule(moduleName, config, instances, result -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
 
@@ -189,14 +181,11 @@ public class DefaultWhenContainer implements WhenContainer {
     public Promise<String> deployWorkerVerticle(String main, JsonObject config, int instances, boolean multiThreaded) {
         final Deferred<String> d = when.defer();
 
-        container.deployWorkerVerticle(main, config, instances, multiThreaded, new Handler<AsyncResult<String>>() {
-            @Override
-            public void handle(AsyncResult<String> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    reject(d, result.result(), result.cause());
-                }
+        container.deployWorkerVerticle(main, config, instances, multiThreaded, result -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
 
@@ -210,15 +199,12 @@ public class DefaultWhenContainer implements WhenContainer {
      */
     @Override
     public Promise<Void> undeployVerticle(String deploymentID) {
-        final Deferred<Void> d = new When<Void>().defer();
-        container.undeployVerticle(deploymentID, new Handler<AsyncResult<Void>>() {
-            @Override
-            public void handle(AsyncResult<Void> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve((Void) null);
-                } else {
-                    d.getResolver().reject(result.cause());
-                }
+        final Deferred<Void> d = when.defer();
+        container.undeployVerticle(deploymentID, result -> {
+            if (result.succeeded()) {
+                d.resolve((Void) null);
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -231,15 +217,12 @@ public class DefaultWhenContainer implements WhenContainer {
      */
     @Override
     public Promise<Void> undeployModule(String deploymentID) {
-        final Deferred<Void> d = new When<Void>().defer();
-        container.undeployModule(deploymentID, new Handler<AsyncResult<Void>>() {
-            @Override
-            public void handle(AsyncResult<Void> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve((Void) null);
-                } else {
-                    d.getResolver().reject(result.cause());
-                }
+        final Deferred<Void> d = when.defer();
+        container.undeployModule(deploymentID, result -> {
+            if (result.succeeded()) {
+                d.resolve((Void) null);
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -277,10 +260,6 @@ public class DefaultWhenContainer implements WhenContainer {
         }
 
         return promises;
-    }
-
-    protected void reject(Deferred<String> d, String result, Throwable t) {
-        d.getResolver().reject(new Value<>(result, t));
     }
 
 }

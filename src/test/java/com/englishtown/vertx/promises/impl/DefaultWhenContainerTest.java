@@ -1,9 +1,9 @@
 package com.englishtown.vertx.promises.impl;
 
-import com.englishtown.promises.Done2;
+import com.englishtown.promises.Done;
 import com.englishtown.promises.Promise;
 import com.englishtown.promises.When;
-import com.englishtown.promises.WhenProgress;
+import com.englishtown.promises.WhenFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,10 +18,12 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
 
 import java.util.List;
-import java.util.concurrent.Executor;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -32,7 +34,7 @@ public class DefaultWhenContainerTest {
 
     private DefaultWhenContainer whenContainer;
     private Promise<String> promise;
-    private Done2<String> done = new Done2<>();
+    private Done<String> done = new Done<>();
 
     @Mock
     Container container;
@@ -50,13 +52,8 @@ public class DefaultWhenContainerTest {
 
     @Before
     public void setUp() {
-        WhenProgress.setNextTick(new Executor() {
-            @Override
-            public void execute(Runnable command) {
-                command.run();
-            }
-        });
-        whenContainer = new DefaultWhenContainer(container);
+        When when = WhenFactory.createSync();
+        whenContainer = new DefaultWhenContainer(container, when);
     }
 
     @Test
@@ -68,8 +65,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertSuccess();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertFulfilled();
     }
 
     @Test
@@ -81,8 +78,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertFailed();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertRejected();
     }
 
     @Test
@@ -95,8 +92,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertSuccess();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertFulfilled();
     }
 
     @Test
@@ -109,8 +106,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertFailed();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertRejected();
     }
 
     @Test
@@ -122,8 +119,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertSuccess();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertFulfilled();
     }
 
     @Test
@@ -135,8 +132,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertFailed();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertRejected();
     }
 
     @Test
@@ -148,8 +145,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertSuccess();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertFulfilled();
     }
 
     @Test
@@ -161,8 +158,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertFailed();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertRejected();
     }
 
     @Test
@@ -175,8 +172,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertSuccess();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertFulfilled();
     }
 
     @Test
@@ -189,8 +186,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertFailed();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertRejected();
     }
 
     @Test
@@ -202,8 +199,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertSuccess();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertFulfilled();
     }
 
     @Test
@@ -215,8 +212,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertFailed();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertRejected();
     }
 
     @Test
@@ -228,8 +225,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertSuccess();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertFulfilled();
     }
 
     @Test
@@ -241,8 +238,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertFailed();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertRejected();
     }
 
     @Test
@@ -255,8 +252,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertSuccess();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertFulfilled();
     }
 
     @Test
@@ -269,8 +266,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertFailed();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertRejected();
     }
 
     @Test
@@ -282,8 +279,8 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertSuccess();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertFulfilled();
     }
 
     @Test
@@ -295,58 +292,58 @@ public class DefaultWhenContainerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertFailed();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertRejected();
     }
 
     @Test
     public void testUndeployVerticle() throws Exception {
         String deploymentID = "id";
-        Done2<Void> done = new Done2<>();
+        Done<Void> done = new Done<>();
         when(voidResult.succeeded()).thenReturn(true);
 
-        whenContainer.undeployVerticle(deploymentID).then(done.onSuccess, done.onFail);
+        whenContainer.undeployVerticle(deploymentID).then(done.onFulfilled, done.onRejected);
         verify(container).undeployVerticle(eq(deploymentID), voidHandlerCaptor.capture());
 
         voidHandlerCaptor.getValue().handle(voidResult);
-        done.assertSuccess();
+        done.assertFulfilled();
     }
 
     @Test
     public void testUndeployVerticle_Fail() throws Exception {
         String deploymentID = "id";
-        Done2<Void> done = new Done2<>();
+        Done<Void> done = new Done<>();
 
-        whenContainer.undeployVerticle(deploymentID).then(done.onSuccess, done.onFail);
+        whenContainer.undeployVerticle(deploymentID).then(done.onFulfilled, done.onRejected);
         verify(container).undeployVerticle(eq(deploymentID), voidHandlerCaptor.capture());
 
         voidHandlerCaptor.getValue().handle(voidResult);
-        done.assertFailed();
+        done.assertRejected();
     }
 
     @Test
     public void testUndeployModule() throws Exception {
         String deploymentID = "id";
-        Done2<Void> done = new Done2<>();
+        Done<Void> done = new Done<>();
         when(voidResult.succeeded()).thenReturn(true);
 
-        whenContainer.undeployModule(deploymentID).then(done.onSuccess, done.onFail);
+        whenContainer.undeployModule(deploymentID).then(done.onFulfilled, done.onRejected);
         verify(container).undeployModule(eq(deploymentID), voidHandlerCaptor.capture());
 
         voidHandlerCaptor.getValue().handle(voidResult);
-        done.assertSuccess();
+        done.assertFulfilled();
     }
 
     @Test
     public void testUndeployModule_Fail() throws Exception {
         String deploymentID = "id";
-        Done2<Void> done = new Done2<>();
+        Done<Void> done = new Done<>();
 
-        whenContainer.undeployModule(deploymentID).then(done.onSuccess, done.onFail);
+        whenContainer.undeployModule(deploymentID).then(done.onFulfilled, done.onRejected);
         verify(container).undeployModule(eq(deploymentID), voidHandlerCaptor.capture());
 
         voidHandlerCaptor.getValue().handle(voidResult);
-        done.assertFailed();
+        done.assertRejected();
     }
 
     @Test
@@ -354,9 +351,9 @@ public class DefaultWhenContainerTest {
 
         JsonArray modules = new JsonArray()
                 .add(new JsonObject()
-                        .putString("name", "com.englishtown~mod1~1.0")
-                        .putNumber("instances", 2)
-                        .putObject("config", new JsonObject().putString("test", "value"))
+                                .putString("name", "com.englishtown~mod1~1.0")
+                                .putNumber("instances", 2)
+                                .putObject("config", new JsonObject().putString("test", "value"))
                 )
                 .add(new JsonObject()
                         .putString("name", "com.englishtown~mod2~1.0"))

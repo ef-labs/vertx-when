@@ -7,22 +7,21 @@
     <parent>
         <artifactId>oss-parent-vertx</artifactId>
         <groupId>com.englishtown</groupId>
-        <version>1.4.0</version>
+        <version>1.5.0</version>
     </parent>
 
     <packaging>jar</packaging>
-    <version>2.0.1</version>
+    <version>3.0.0-RC1</version>
 
     <description>Provides when.java wrappers for standard vert.x objects to return promises.</description>
     <inceptionYear>2013</inceptionYear>
 
     <properties>
         <!--Dependency versions-->
-        <vertx.version>2.1</vertx.version>
-        <when.java.version>2.0.0</when.java.version>
-        <when.java.testtools.version>2.0.0</when.java.testtools.version>
-        <vertx.mod.hk2.version>1.6.0</vertx.mod.hk2.version>
-        <java.inject.version>1</java.inject.version>
+        <vertx.version>2.1.2</vertx.version>
+        <when.java.version>3.0.0-RC1</when.java.version>
+        <vertx.mod.hk2.version>1.7.0</vertx.mod.hk2.version>
+        <vertx.mod.guice.version>1.3.0-final</vertx.mod.guice.version>
     </properties>
 
     <dependencies>
@@ -37,6 +36,12 @@
             <version>${vertx.mod.hk2.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.englishtown</groupId>
+            <artifactId>vertx-mod-guice</artifactId>
+            <version>${vertx.mod.guice.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!--Test dependencies-->
         <dependency>
@@ -47,7 +52,7 @@
         <dependency>
             <groupId>com.englishtown</groupId>
             <artifactId>when.java-testtools</artifactId>
-            <version>${when.java.testtools.version}</version>
+            <version>${when.java.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -61,6 +66,15 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>

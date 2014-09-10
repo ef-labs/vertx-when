@@ -3,12 +3,12 @@ package com.englishtown.vertx.promises.impl;
 import com.englishtown.promises.Deferred;
 import com.englishtown.promises.Promise;
 import com.englishtown.promises.When;
+import com.englishtown.promises.exceptions.RejectException;
 import com.englishtown.vertx.promises.HttpClientResponseAndBody;
 import com.englishtown.vertx.promises.WhenHttpClient;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
-import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpClient;
 import org.vertx.java.core.http.HttpClientRequest;
 import org.vertx.java.core.http.HttpClientResponse;
@@ -28,12 +28,12 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
     public static int CONNECT_TIMEOUT = 10000;
 
     private final Vertx vertx;
-    private final When<HttpClientResponse> when = new When<>();
-    private final When<HttpClientResponseAndBody> whenBody = new When<>();
+    private final When when;
 
     @Inject
-    public DefaultWhenHttpClient(Vertx vertx) {
+    public DefaultWhenHttpClient(Vertx vertx, When when) {
         this.vertx = vertx;
+        this.when = when;
     }
 
     /**
@@ -95,7 +95,7 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
             return request(d, method, getPath(url), client, setupHandler, writeStream, expectedStatuses);
 
         } catch (Throwable t) {
-            d.getResolver().reject(t);
+            d.reject(t);
             return d.getPromise();
         }
 
@@ -196,14 +196,14 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
      */
     @Override
     public Promise<HttpClientResponseAndBody> requestResponseBody(String method, URI url, Handler<HttpClientRequest> setupHandler, Set<Integer> expectedStatuses) {
-        final Deferred<HttpClientResponseAndBody> d = whenBody.defer();
+        final Deferred<HttpClientResponseAndBody> d = when.defer();
 
         try {
             HttpClient client = createClient(url, d);
             return requestResponseBody(d, method, getPath(url), client, setupHandler, expectedStatuses);
 
         } catch (Throwable t) {
-            d.getResolver().reject(t);
+            d.reject(t);
             return d.getPromise();
         }
     }
@@ -247,7 +247,7 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
      */
     @Override
     public Promise<HttpClientResponseAndBody> requestResponseBody(String method, String url, HttpClient client, Handler<HttpClientRequest> setupHandler, Set<Integer> expectedStatuses) {
-        final Deferred<HttpClientResponseAndBody> d = whenBody.defer();
+        final Deferred<HttpClientResponseAndBody> d = when.defer();
         return requestResponseBody(d, method, url, client, setupHandler, expectedStatuses);
     }
 
@@ -268,40 +268,32 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
         final Set<Integer> finalExpectedStatuses = expectedStatuses;
 
         try {
-            HttpClientRequest request = client.request(method, url, new Handler<HttpClientResponse>() {
-                @Override
-                public void handle(final HttpClientResponse response) {
-                    // Short circuit, no need to wait for response end
-                    if (writeStream == null) {
-                        if (finalExpectedStatuses.contains(response.statusCode())) {
-                            d.getResolver().resolve(response);
-                        } else {
-                            d.getResolver().reject(response);
-                        }
-                        return;
+            HttpClientRequest request = client.request(method, url, response -> {
+                // Short circuit, no need to wait for response end
+                if (writeStream == null) {
+                    if (finalExpectedStatuses.contains(response.statusCode())) {
+                        d.resolve(response);
+                    } else {
+                        d.reject(new RejectException().setValue(response));
                     }
+                    return;
+                }
 
-                    Pump.createPump(response, writeStream).start();
+                Pump.createPump(response, writeStream).start();
 
-                    response.endHandler(new Handler<Void>() {
-                        @Override
-                        public void handle(Void event) {
-                            if (finalExpectedStatuses.contains(response.statusCode())) {
-                                d.getResolver().resolve(response);
-                            } else {
-                                d.getResolver().reject(response);
-                            }
+                response.endHandler(new Handler<Void>() {
+                    @Override
+                    public void handle(Void event) {
+                        if (finalExpectedStatuses.contains(response.statusCode())) {
+                            d.resolve(response);
+                        } else {
+                            d.reject(new RejectException().setValue(response));
                         }
-                    });
-                }
+                    }
+                });
             });
 
-            request.exceptionHandler(new Handler<Throwable>() {
-                @Override
-                public void handle(Throwable t) {
-                    d.getResolver().reject(t);
-                }
-            });
+            request.exceptionHandler(t -> d.reject(t));
 
             if (setupHandler != null) {
                 setupHandler.handle(request);
@@ -310,7 +302,7 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
             }
 
         } catch (Throwable t) {
-            d.getResolver().reject(t);
+            d.reject(t);
         }
 
         return d.getPromise();
@@ -333,29 +325,20 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
         final Set<Integer> finalExpectedStatuses = expectedStatuses;
 
         try {
-            HttpClientRequest request = client.request(method, url, new Handler<HttpClientResponse>() {
-                @Override
-                public void handle(final HttpClientResponse response) {
-                    response.bodyHandler(new Handler<Buffer>() {
-                        @Override
-                        public void handle(Buffer body) {
-                            HttpClientResponseAndBody responseAndBody = new DefaultHttpClientResponseAndBody(response, body);
-                            if (finalExpectedStatuses.contains(response.statusCode())) {
-                                d.getResolver().resolve(responseAndBody);
-                            } else {
-                                d.getResolver().reject(responseAndBody);
+            HttpClientRequest request = client.request(method, url,
+                    response -> response.bodyHandler(
+                            body -> {
+                                HttpClientResponseAndBody responseAndBody = new DefaultHttpClientResponseAndBody(response, body);
+                                if (finalExpectedStatuses.contains(response.statusCode())) {
+                                    d.resolve(responseAndBody);
+                                } else {
+                                    d.reject(new RejectException().setValue(responseAndBody));
+                                }
                             }
-                        }
-                    });
-                }
-            });
+                    )
+            );
 
-            request.exceptionHandler(new Handler<Throwable>() {
-                @Override
-                public void handle(Throwable t) {
-                    d.getResolver().reject(t);
-                }
-            });
+            request.exceptionHandler(t -> d.reject(t));
 
             if (setupHandler != null) {
                 setupHandler.handle(request);
@@ -364,7 +347,7 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
             }
 
         } catch (Throwable t) {
-            d.getResolver().reject(t);
+            d.reject(t);
         }
 
         return d.getPromise();
@@ -382,12 +365,7 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
                 .setHost(url.getHost())
                 .setPort(port)
                 .setConnectTimeout(CONNECT_TIMEOUT)
-                .exceptionHandler(new Handler<Throwable>() {
-                    @Override
-                    public void handle(Throwable t) {
-                        d.getResolver().reject(t);
-                    }
-                });
+                .exceptionHandler(t -> d.reject(t));
     }
 
     protected String getPath(URI url) {

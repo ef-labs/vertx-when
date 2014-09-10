@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 public class DefaultWhenHttpClientTest {
 
     DefaultWhenHttpClient whenHttpClient;
-    Done2<HttpClientResponse> done = new Done2<>();
+    Done<HttpClientResponse> done = new Done<>();
 
     @Mock
     Vertx vertx;
@@ -54,79 +54,64 @@ public class DefaultWhenHttpClientTest {
     @SuppressWarnings("unchecked")
     @Before
     public void setUp() throws Exception {
-        WhenProgress.setNextTick(new Executor() {
-            @Override
-            public void execute(Runnable command) {
-                command.run();
-            }
-        });
+        When when = WhenFactory.createSync();
         when(vertx.createHttpClient()).thenReturn(client);
         when(client.request(anyString(), anyString(), any(Handler.class))).thenReturn(request);
         when(client.setHost(anyString())).thenReturn(client);
         when(client.setPort(anyInt())).thenReturn(client);
         when(client.setConnectTimeout(anyInt())).thenReturn(client);
         when(client.exceptionHandler(any(Handler.class))).thenReturn(client);
-        whenHttpClient = new DefaultWhenHttpClient(vertx);
+        whenHttpClient = new DefaultWhenHttpClient(vertx, when);
     }
 
     @Test
     public void testRequest_1Success() throws Exception {
         when(response.statusCode()).thenReturn(HttpResponseStatus.OK.code());
         URI url = URI.create("http://test.englishtown.com");
-        whenHttpClient.request(HttpMethod.GET.name(), url).then(done.onSuccess, done.onFail);
+        whenHttpClient.request(HttpMethod.GET.name(), url).then(done.onFulfilled, done.onRejected);
         verify(client).request(eq(HttpMethod.GET.name()), anyString(), handlerCaptor.capture());
         handlerCaptor.getValue().handle(response);
-        done.assertSuccess();
+        done.assertFulfilled();
     }
 
     @Test
     public void testRequest_1Failed() throws Exception {
         when(response.statusCode()).thenReturn(HttpResponseStatus.INTERNAL_SERVER_ERROR.code());
         URI url = URI.create("http://test.englishtown.com");
-        whenHttpClient.request(HttpMethod.GET.name(), url).then(done.onSuccess, done.onFail);
+        whenHttpClient.request(HttpMethod.GET.name(), url).then(done.onFulfilled, done.onRejected);
         verify(client).request(eq(HttpMethod.GET.name()), anyString(), handlerCaptor.capture());
         handlerCaptor.getValue().handle(response);
-        done.assertFailed();
+        done.assertRejected();
     }
 
     @Test
     public void testRequest_2() throws Exception {
         when(response.statusCode()).thenReturn(HttpResponseStatus.OK.code());
         URI url = URI.create("http://test.englishtown.com");
-        whenHttpClient.request(HttpMethod.GET.name(), url, new Handler<HttpClientRequest>() {
-            @Override
-            public void handle(HttpClientRequest req) {
-                assertEquals(request, req);
-            }
-        }).then(done.onSuccess, done.onFail);
+        whenHttpClient.request(HttpMethod.GET.name(), url, req -> assertEquals(request, req)).then(done.onFulfilled, done.onRejected);
         verify(client).request(eq(HttpMethod.GET.name()), anyString(), handlerCaptor.capture());
         handlerCaptor.getValue().handle(response);
-        done.assertSuccess();
+        done.assertFulfilled();
     }
 
     @Test
     public void testRequest_3() throws Exception {
         when(response.statusCode()).thenReturn(HttpResponseStatus.OK.code());
         String url = "";
-        whenHttpClient.request(HttpMethod.GET.name(), url, client).then(done.onSuccess, done.onFail);
+        whenHttpClient.request(HttpMethod.GET.name(), url, client).then(done.onFulfilled, done.onRejected);
         verify(client).request(eq(HttpMethod.GET.name()), anyString(), handlerCaptor.capture());
         handlerCaptor.getValue().handle(response);
-        done.assertSuccess();
+        done.assertFulfilled();
     }
 
     @Test
     public void testRequest_4() throws Exception {
         when(response.statusCode()).thenReturn(HttpResponseStatus.OK.code());
         String url = "";
-        whenHttpClient.request(HttpMethod.GET.name(), url, client, new Handler<HttpClientRequest>() {
-            @Override
-            public void handle(HttpClientRequest req) {
-                assertEquals(request, req);
-            }
-        }).then(done.onSuccess, done.onFail);
+        whenHttpClient.request(HttpMethod.GET.name(), url, client, req -> assertEquals(request, req)).then(done.onFulfilled, done.onRejected);
         verify(client).request(eq(HttpMethod.GET.name()), anyString(), handlerCaptor.capture());
         handlerCaptor.getValue().handle(response);
-        done.assertSuccess();
+        done.assertFulfilled();
     }
 
     @Test
@@ -134,37 +119,12 @@ public class DefaultWhenHttpClientTest {
         WriteStream<?> writeStream = mock(WriteStream.class);
         when(response.statusCode()).thenReturn(HttpResponseStatus.OK.code());
         String url = "";
-        whenHttpClient.request(HttpMethod.GET.name(), url, client, null, writeStream).then(done.onSuccess, done.onFail);
+        whenHttpClient.request(HttpMethod.GET.name(), url, client, null, writeStream).then(done.onFulfilled, done.onRejected);
         verify(client).request(eq(HttpMethod.GET.name()), anyString(), handlerCaptor.capture());
         handlerCaptor.getValue().handle(response);
         verify(response).endHandler(endHandlerCaptor.capture());
         endHandlerCaptor.getValue().handle(null);
-        done.assertSuccess();
+        done.assertFulfilled();
     }
 
-    public void test() {
-
-        List<Promise<HttpClientResponse>> promises = new ArrayList<>();
-        When<HttpClientResponse> when = new When<>();
-
-        promises.add(whenHttpClient.request(HttpMethod.GET.name(), URI.create("http://test.englishtown.com/test1")));
-        promises.add(whenHttpClient.request(HttpMethod.POST.name(), URI.create("http://test.englishtown.com/test2")));
-
-        when.all(promises).then(
-                new FulfilledRunnable<List<? extends HttpClientResponse>>() {
-                    @Override
-                    public Promise<List<? extends HttpClientResponse>> run(List<? extends HttpClientResponse> value) {
-                        // On success
-                        return null;
-                    }
-                },
-                new RejectedRunnable<List<? extends HttpClientResponse>>() {
-                    @Override
-                    public Promise<List<? extends HttpClientResponse>> run(Value<List<? extends HttpClientResponse>> value) {
-                        // On fail
-                        return null;
-                    }
-                }
-        );
-    }
 }
