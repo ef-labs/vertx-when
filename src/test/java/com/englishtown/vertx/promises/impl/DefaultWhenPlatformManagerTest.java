@@ -1,8 +1,9 @@
 package com.englishtown.vertx.promises.impl;
 
-import com.englishtown.promises.Done2;
+import com.englishtown.promises.Done;
 import com.englishtown.promises.Promise;
-import com.englishtown.promises.WhenProgress;
+import com.englishtown.promises.When;
+import com.englishtown.promises.WhenFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +17,6 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.PlatformManager;
 
 import java.net.URL;
-import java.util.concurrent.Executor;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -28,7 +28,7 @@ public class DefaultWhenPlatformManagerTest {
 
     private DefaultWhenPlatformManager defaultWhenPlatformManager;
     private Promise<String> promise;
-    private Done2<String> done = new Done2<>();
+    private Done<String> done = new Done<>();
 
     @Mock
     PlatformManager manager;
@@ -42,13 +42,8 @@ public class DefaultWhenPlatformManagerTest {
 
     @Before
     public void setUp() {
-        WhenProgress.setNextTick(new Executor() {
-            @Override
-            public void execute(Runnable command) {
-                command.run();
-            }
-        });
-        defaultWhenPlatformManager = new DefaultWhenPlatformManager(manager);
+        When when = WhenFactory.createSync();
+        defaultWhenPlatformManager = new DefaultWhenPlatformManager(manager, when);
     }
 
     @Test
@@ -60,8 +55,8 @@ public class DefaultWhenPlatformManagerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertSuccess();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertFulfilled();
     }
 
     @Test
@@ -73,8 +68,8 @@ public class DefaultWhenPlatformManagerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertFailed();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertRejected();
     }
 
     @Test
@@ -86,8 +81,8 @@ public class DefaultWhenPlatformManagerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertSuccess();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertFulfilled();
     }
 
     @Test
@@ -99,8 +94,8 @@ public class DefaultWhenPlatformManagerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertFailed();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertRejected();
     }
 
     @Test
@@ -112,8 +107,8 @@ public class DefaultWhenPlatformManagerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertSuccess();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertFulfilled();
     }
 
     @Test
@@ -125,7 +120,7 @@ public class DefaultWhenPlatformManagerTest {
 
         handlerCaptor.getValue().handle(result);
 
-        promise.then(done.onSuccess, done.onFail);
-        done.assertFailed();
+        promise.then(done.onFulfilled, done.onRejected);
+        done.assertRejected();
     }
 }

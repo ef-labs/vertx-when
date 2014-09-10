@@ -2,7 +2,6 @@ package com.englishtown.vertx.promises.impl;
 
 import com.englishtown.promises.Deferred;
 import com.englishtown.promises.Promise;
-import com.englishtown.promises.Value;
 import com.englishtown.promises.When;
 import com.englishtown.vertx.promises.WhenPlatformManager;
 import org.vertx.java.core.AsyncResult;
@@ -19,304 +18,268 @@ import java.util.Map;
  */
 public class DefaultWhenPlatformManager implements WhenPlatformManager {
 
-	private final PlatformManager manager;
-	private final When<String> when = new When<>();
+    private final PlatformManager manager;
+    private final When when;
 
-	@Inject
-	public DefaultWhenPlatformManager(PlatformManager manager) {
-		this.manager = manager;
-	}
+    @Inject
+    public DefaultWhenPlatformManager(PlatformManager manager, When when) {
+        this.manager = manager;
+        this.when = when;
+    }
 
-	protected void reject(Deferred<String> d, String result, Throwable t) {
-		RuntimeException e = (t == null || t instanceof RuntimeException ? (RuntimeException) t : new RuntimeException(t));
-		d.getResolver().reject(new Value<>(result, e));
-	}
+    /**
+     * Deploy a verticle
+     *
+     * @param main      The main, e.g. app.js, foo.rb, org.mycompany.MyMain, etc
+     * @param config    Any JSON config to pass to the verticle, or null if none
+     * @param classpath The classpath for the verticle
+     * @param instances The number of instances to deploy
+     * @param includes  Comma separated list of modules to include, or null if none
+     * @return Promise of deployment
+     */
+    @Override
+    public Promise<String> deployVerticle(String main, JsonObject config, URL[] classpath, int instances, String includes) {
+        final Deferred<String> d = when.defer();
 
-	protected void reject(Deferred<Void> d, Void result, Throwable t) {
-		RuntimeException e = (t == null || t instanceof RuntimeException ? (RuntimeException) t : new RuntimeException(t));
-		d.getResolver().reject(new Value<>(result, e));
-	}
+        manager.deployVerticle(main, config, classpath, instances, includes, result -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
+            }
+        });
 
-	/**
-	 * Deploy a verticle
-	 *
-	 * @param main      The main, e.g. app.js, foo.rb, org.mycompany.MyMain, etc
-	 * @param config    Any JSON config to pass to the verticle, or null if none
-	 * @param classpath The classpath for the verticle
-	 * @param instances The number of instances to deploy
-	 * @param includes  Comma separated list of modules to include, or null if none
-	 * @return Promise of deployment
-	 */
-	@Override
-	public Promise<String> deployVerticle(String main, JsonObject config, URL[] classpath, int instances, String includes) {
-		final Deferred<String> d = when.defer();
+        return d.getPromise();
+    }
 
-		manager.deployVerticle(main, config, classpath, instances, includes, new Handler<AsyncResult<String>>() {
-			@Override
-			public void handle(AsyncResult<String> result) {
-				if (result.succeeded()) {
-					d.getResolver().resolve(result.result());
-				} else {
-					reject(d, result.result(), result.cause());
-				}
-			}
-		});
+    /**
+     * Deploy a worker verticle
+     *
+     * @param multiThreaded Is it a multi-threaded worker verticle?
+     * @param main          The main, e.g. app.js, foo.rb, org.mycompany.MyMain, etc
+     * @param config        Any JSON config to pass to the verticle, or null if none
+     * @param classpath     The classpath for the verticle
+     * @param instances     The number of instances to deploy
+     * @param includes      Comma separated list of modules to include, or null if none
+     * @return Promise of deployment
+     */
+    @Override
+    public Promise<String> deployWorkerVerticle(boolean multiThreaded, String main, JsonObject config, URL[] classpath, int instances, String includes) {
+        final Deferred<String> d = when.defer();
 
-		return d.getPromise();
-	}
+        manager.deployWorkerVerticle(multiThreaded, main, config, classpath, instances, includes, result -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
+            }
+        });
 
-	/**
-	 * Deploy a worker verticle
-	 *
-	 * @param multiThreaded Is it a multi-threaded worker verticle?
-	 * @param main          The main, e.g. app.js, foo.rb, org.mycompany.MyMain, etc
-	 * @param config        Any JSON config to pass to the verticle, or null if none
-	 * @param classpath     The classpath for the verticle
-	 * @param instances     The number of instances to deploy
-	 * @param includes      Comma separated list of modules to include, or null if none
-	 * @return Promise of deployment
-	 */
-	@Override
-	public Promise<String> deployWorkerVerticle(boolean multiThreaded, String main, JsonObject config, URL[] classpath, int instances, String includes) {
-		final Deferred<String> d = when.defer();
+        return d.getPromise();
+    }
 
-		manager.deployWorkerVerticle(multiThreaded, main, config, classpath, instances, includes, new Handler<AsyncResult<String>>() {
-			@Override
-			public void handle(AsyncResult<String> result) {
-				if (result.succeeded()) {
-					d.getResolver().resolve(result.result());
-				} else {
-					reject(d, result.result(), result.cause());
-				}
-			}
-		});
+    /**
+     * Deploy a module
+     *
+     * @param moduleName The name of the module to deploy
+     * @param config     Any JSON config to pass to the verticle, or null if none
+     * @param instances  The number of instances to deploy
+     * @return Promise of deployment
+     */
+    @Override
+    public Promise<String> deployModule(String moduleName, JsonObject config, int instances) {
+        final Deferred<String> d = when.defer();
 
-		return d.getPromise();
-	}
+        manager.deployModule(moduleName, config, instances, result -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
+            }
+        });
 
-	/**
-	 * Deploy a module
-	 *
-	 * @param moduleName The name of the module to deploy
-	 * @param config     Any JSON config to pass to the verticle, or null if none
-	 * @param instances  The number of instances to deploy
-	 * @return Promise of deployment
-	 */
-	@Override
-	public Promise<String> deployModule(String moduleName, JsonObject config, int instances) {
-		final Deferred<String> d = when.defer();
+        return d.getPromise();
+    }
 
-		manager.deployModule(moduleName, config, instances, new Handler<AsyncResult<String>>() {
-			@Override
-			public void handle(AsyncResult<String> result) {
-				if (result.succeeded()) {
-					d.getResolver().resolve(result.result());
-				} else {
-					reject(d, result.result(), result.cause());
-				}
-			}
-		});
+    /**
+     * Deploy a module from a zip file. The zip must contain a valid Vert.x module. Vert.x will automatically install the module from the zip into the local mods dir or the system mods dir (if it's a system module), or VERTX_MODS if set, and then deploy the module
+     *
+     * @param zipFileName The name of the zip file that contains the module
+     * @param config      Any JSON config to pass to the verticle, or null if none
+     * @param instances   The number of instances to deploy
+     * @return Promise of deployment
+     */
+    @Override
+    public Promise<String> deployModuleFromZip(String zipFileName, JsonObject config, int instances) {
+        final Deferred<String> d = when.defer();
 
-		return d.getPromise();
-	}
+        manager.deployModuleFromZip(zipFileName, config, instances, result -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
+            }
+        });
 
-	/**
-	 * Deploy a module from a zip file. The zip must contain a valid Vert.x module. Vert.x will automatically install the module from the zip into the local mods dir or the system mods dir (if it's a system module), or VERTX_MODS if set, and then deploy the module
-	 *
-	 * @param zipFileName The name of the zip file that contains the module
-	 * @param config      Any JSON config to pass to the verticle, or null if none
-	 * @param instances   The number of instances to deploy
-	 * @return Promise of deployment
-	 */
-	@Override
-	public Promise<String> deployModuleFromZip(String zipFileName, JsonObject config, int instances) {
-		final Deferred<String> d = when.defer();
+        return d.getPromise();
+    }
 
-		manager.deployModuleFromZip(zipFileName, config, instances, new Handler<AsyncResult<String>>() {
-			@Override
-			public void handle(AsyncResult<String> result) {
-				if (result.succeeded()) {
-					d.getResolver().resolve(result.result());
-				} else {
-					reject(d, result.result(), result.cause());
-				}
-			}
-		});
+    /**
+     * Deploy a module from the classpath. The classpath must contain a single mod.json and the resources for that module only.
+     *
+     * @param moduleName The name of the module to deploy
+     * @param config     Any JSON config to pass to the verticle, or null if none
+     * @param instances  The number of instances to deploy
+     * @param classpath  Array of URLS corresponding to the classpath for the module
+     * @return Promise of deployment
+     */
+    @Override
+    public Promise<String> deployModuleFromClasspath(String moduleName, JsonObject config, int instances, URL[] classpath) {
+        final Deferred<String> d = when.defer();
 
-		return d.getPromise();
-	}
+        manager.deployModuleFromClasspath(moduleName, config, instances, classpath, result -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
+            }
+        });
 
-	/**
-	 * Deploy a module from the classpath. The classpath must contain a single mod.json and the resources for that module only.
-	 *
-	 * @param moduleName The name of the module to deploy
-	 * @param config     Any JSON config to pass to the verticle, or null if none
-	 * @param instances  The number of instances to deploy
-	 * @param classpath  Array of URLS corresponding to the classpath for the module
-	 * @return Promise of deployment
-	 */
-	@Override
-	public Promise<String> deployModuleFromClasspath(String moduleName, JsonObject config, int instances, URL[] classpath) {
-		final Deferred<String> d = when.defer();
+        return d.getPromise();
+    }
 
-		manager.deployModuleFromClasspath(moduleName, config, instances, classpath, new Handler<AsyncResult<String>>() {
-			@Override
-			public void handle(AsyncResult<String> result) {
-				if (result.succeeded()) {
-					d.getResolver().resolve(result.result());
-				} else {
-					reject(d, result.result(), result.cause());
-				}
-			}
-		});
+    /**
+     * Undeploy a deployment
+     *
+     * @param deploymentID The ID of the deployment to undeploy, as given in the doneHandler when deploying
+     * @return Promise of undeployment
+     */
+    @Override
+    public Promise<Void> undeploy(String deploymentID) {
+        final Deferred<Void> d = when.defer();
 
-		return d.getPromise();
-	}
+        manager.undeploy(deploymentID, result -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
+            }
+        });
 
-	/**
-	 * Undeploy a deployment
-	 *
-	 * @param deploymentID The ID of the deployment to undeploy, as given in the doneHandler when deploying
-	 * @return Promise of undeployment
-	 */
-	@Override
-	public Promise<Void> undeploy(String deploymentID) {
-		final Deferred<Void> d = new When<Void>().defer();
+        return d.getPromise();
+    }
 
-		manager.undeploy(deploymentID, new Handler<AsyncResult<Void>>() {
-			@Override
-			public void handle(AsyncResult<Void> result) {
-				if (result.succeeded()) {
-					d.getResolver().resolve(result.result());
-				} else {
-					reject(d, result.result(), result.cause());
-				}
-			}
-		});
+    /**
+     * Undeploy all verticles and modules
+     *
+     * @return Promise of undeployment
+     */
+    @Override
+    public Promise<Void> undeployAll() {
+        final Deferred<Void> d = when.defer();
 
-		return d.getPromise();
-	}
+        manager.undeployAll(result -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
+            }
+        });
 
-	/**
-	 * Undeploy all verticles and modules
-	 *
-	 * @return Promise of undeployment
-	 */
-	@Override
-	public Promise<Void> undeployAll() {
-		final Deferred<Void> d = new When<Void>().defer();
+        return d.getPromise();
+    }
 
-		manager.undeployAll(new Handler<AsyncResult<Void>>() {
-			@Override
-			public void handle(AsyncResult<Void> result) {
-				if (result.succeeded()) {
-					d.getResolver().resolve(result.result());
-				} else {
-					reject(d, result.result(), result.cause());
-				}
-			}
-		});
+    /**
+     * List all deployments, with deployment ID and number of instances
+     *
+     * @return map of instances
+     */
+    @Override
+    public Map<String, Integer> listInstances() {
+        return manager.listInstances();
+    }
 
-		return d.getPromise();
-	}
+    /**
+     * Install a module into the filesystem Vert.x will search in the configured repos to locate the module
+     *
+     * @param moduleName The name of the module
+     * @return Promise of installation
+     */
+    @Override
+    public Promise<Void> installModule(String moduleName) {
+        final Deferred<Void> d = when.defer();
 
-	/**
-	 * List all deployments, with deployment ID and number of instances
-	 *
-	 * @return map of instances
-	 */
-	@Override
-	public Map<String, Integer> listInstances() {
-		return manager.listInstances();
-	}
+        manager.installModule(moduleName, result -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
+            }
+        });
 
-	/**
-	 * Install a module into the filesystem Vert.x will search in the configured repos to locate the module
-	 *
-	 * @param moduleName The name of the module
-	 * @return Promise of installation
-	 */
-	@Override
-	public Promise<Void> installModule(String moduleName) {
-		final Deferred<Void> d = new When<Void>().defer();
+        return d.getPromise();
+    }
 
-		manager.installModule(moduleName, new Handler<AsyncResult<Void>>() {
-			@Override
-			public void handle(AsyncResult<Void> result) {
-				if (result.succeeded()) {
-					d.getResolver().resolve(result.result());
-				} else {
-					reject(d, result.result(), result.cause());
-				}
-			}
-		});
+    /**
+     * Uninstall a module from the filesystem
+     *
+     * @param moduleName The name of the module
+     * @return Promise of uninstallation
+     */
+    @Override
+    public Promise<Void> uninstallModule(String moduleName) {
+        final Deferred<Void> d = when.defer();
 
-		return d.getPromise();
-	}
+        manager.uninstallModule(moduleName, new Handler<AsyncResult<Void>>() {
+            @Override
+            public void handle(AsyncResult<Void> result) {
+                if (result.succeeded()) {
+                    d.resolve(result.result());
+                } else {
+                    d.reject(result.cause());
+                }
+            }
+        });
 
-	/**
-	 * Uninstall a module from the filesystem
-	 *
-	 * @param moduleName The name of the module
-	 * @return Promise of uninstallation
-	 */
-	@Override
-	public Promise<Void> uninstallModule(String moduleName) {
-		final Deferred<Void> d = new When<Void>().defer();
+        return d.getPromise();
+    }
 
-		manager.uninstallModule(moduleName, new Handler<AsyncResult<Void>>() {
-			@Override
-			public void handle(AsyncResult<Void> result) {
-				if (result.succeeded()) {
-					d.getResolver().resolve(result.result());
-				} else {
-					reject(d, result.result(), result.cause());
-				}
-			}
-		});
+    /**
+     * Pull in all the dependencies (the 'includes' and the 'deploys' fields in mod.json) and copy them into an internal mods directory in the module. This allows a self contained module to be created.
+     *
+     * @param moduleName The name of the module
+     * @return Promise of pull
+     */
+    @Override
+    public Promise<Void> pullInDependencies(String moduleName) {
+        final Deferred<Void> d = when.defer();
 
-		return d.getPromise();
-	}
+        manager.pullInDependencies(moduleName, result -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
+            }
+        });
 
-	/**
-	 * Pull in all the dependencies (the 'includes' and the 'deploys' fields in mod.json) and copy them into an internal mods directory in the module. This allows a self contained module to be created.
-	 *
-	 * @param moduleName The name of the module
-	 * @return Promise of pull
-	 */
-	@Override
-	public Promise<Void> pullInDependencies(String moduleName) {
-		final Deferred<Void> d = new When<Void>().defer();
+        return d.getPromise();
+    }
 
-		manager.pullInDependencies(moduleName, new Handler<AsyncResult<Void>>() {
-			@Override
-			public void handle(AsyncResult<Void> result) {
-				if (result.succeeded()) {
-					d.getResolver().resolve(result.result());
-				} else {
-					reject(d, result.result(), result.cause());
-				}
-			}
-		});
+    /**
+     * Register a handler that will be called when the platform exits because of a verticle calling container.exit()
+     *
+     * @param handler The handler
+     */
+    @Override
+    public void registerExitHandler(Handler<Void> handler) {
+        manager.registerExitHandler(handler);
+    }
 
-		return d.getPromise();
-	}
-
-	/**
-	 * Register a handler that will be called when the platform exits because of a verticle calling container.exit()
-	 *
-	 * @param handler The handler
-	 */
-	@Override
-	public void registerExitHandler(Handler<Void> handler) {
-		manager.registerExitHandler(handler);
-	}
-
-	/**
-	 * Stop the platform manager
-	 */
-	@Override
-	public void stop() {
-		manager.stop();
-	}
+    /**
+     * Stop the platform manager
+     */
+    @Override
+    public void stop() {
+        manager.stop();
+    }
 }

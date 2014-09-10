@@ -2,7 +2,6 @@ package com.englishtown.vertx.promises.impl;
 
 import com.englishtown.promises.Deferred;
 import com.englishtown.promises.Promise;
-import com.englishtown.promises.Value;
 import com.englishtown.promises.When;
 import com.englishtown.vertx.promises.WhenEventBus;
 import org.vertx.java.core.AsyncResult;
@@ -23,16 +22,17 @@ import javax.inject.Inject;
 public class DefaultWhenEventBus implements WhenEventBus {
 
     private final EventBus eventBus;
+    private final When when;
 
     /**
      * Takes the event bus off the provided vert.x instance
      *
-     * @param vertx the vertx instance with the event bus to wrap
+     * @param vertx     the vertx instance with the event bus to wrap
      * @param container the container instance
      */
     @Inject
-    public DefaultWhenEventBus(Vertx vertx, Container container) {
-        eventBus = vertx.eventBus();
+    public DefaultWhenEventBus(Vertx vertx, Container container, When when) {
+        this(vertx.eventBus(), when);
     }
 
     /**
@@ -40,8 +40,9 @@ public class DefaultWhenEventBus implements WhenEventBus {
      *
      * @param eventBus the event bus instance to wrap
      */
-    public DefaultWhenEventBus(EventBus eventBus) {
+    public DefaultWhenEventBus(EventBus eventBus, When when) {
         this.eventBus = eventBus;
+        this.when = when;
     }
 
     /**
@@ -56,13 +57,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public Promise<Message> send(String address, Object message) {
-        final Deferred<Message> d = new When<Message>().defer();
-        eventBus.send(address, message, new Handler<Message>() {
-            @Override
-            public void handle(Message reply) {
-                d.getResolver().resolve(reply);
-            }
-        });
+        final Deferred<Message> d = when.defer();
+        eventBus.send(address, message, reply -> d.resolve(reply));
         return d.getPromise();
     }
 
@@ -75,15 +71,12 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> sendWithTimeout(String address, Object message, long timeout) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
-            @Override
-            public void handle(AsyncResult<Message<T>> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    d.getResolver().reject(result.cause());
-                }
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.sendWithTimeout(address, message, timeout, (AsyncResult<Message<T>> result) -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -91,13 +84,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public <T> Promise<Message<T>> send(String address, JsonObject message) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.send(address, message, new Handler<Message<T>>() {
-            @Override
-            public void handle(Message<T> reply) {
-                d.getResolver().resolve(reply);
-            }
-        });
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.send(address, message, (Message<T> reply) -> d.resolve(reply));
         return d.getPromise();
     }
 
@@ -110,15 +98,12 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> sendWithTimeout(String address, JsonObject message, long timeout) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
-            @Override
-            public void handle(AsyncResult<Message<T>> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    d.getResolver().reject(result.cause());
-                }
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.sendWithTimeout(address, message, timeout, (AsyncResult<Message<T>> result) -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -126,13 +111,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public <T> Promise<Message<T>> send(String address, JsonArray message) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.send(address, message, new Handler<Message<T>>() {
-            @Override
-            public void handle(Message<T> reply) {
-                d.getResolver().resolve(reply);
-            }
-        });
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.send(address, message, (Message<T> reply) -> d.resolve(reply));
         return d.getPromise();
     }
 
@@ -145,15 +125,12 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> sendWithTimeout(String address, JsonArray message, long timeout) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
-            @Override
-            public void handle(AsyncResult<Message<T>> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    d.getResolver().reject(result.cause());
-                }
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.sendWithTimeout(address, message, timeout, (AsyncResult<Message<T>> result) -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -161,13 +138,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public <T> Promise<Message<T>> send(String address, Buffer message) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.send(address, message, new Handler<Message<T>>() {
-            @Override
-            public void handle(Message<T> reply) {
-                d.getResolver().resolve(reply);
-            }
-        });
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.send(address, message, (Message<T> reply) -> d.resolve(reply));
         return d.getPromise();
     }
 
@@ -180,15 +152,12 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> sendWithTimeout(String address, Buffer message, long timeout) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
-            @Override
-            public void handle(AsyncResult<Message<T>> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    d.getResolver().reject(result.cause());
-                }
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.sendWithTimeout(address, message, timeout, (AsyncResult<Message<T>> result) -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -196,13 +165,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public <T> Promise<Message<T>> send(String address, byte[] message) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.send(address, message, new Handler<Message<T>>() {
-            @Override
-            public void handle(Message<T> reply) {
-                d.getResolver().resolve(reply);
-            }
-        });
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.send(address, message, (Message<T> reply) -> d.resolve(reply));
         return d.getPromise();
     }
 
@@ -215,14 +179,14 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> sendWithTimeout(String address, byte[] message, long timeout) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
+        final Deferred<Message<T>> d = when.defer();
         eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
             @Override
             public void handle(AsyncResult<Message<T>> result) {
                 if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
+                    d.resolve(result.result());
                 } else {
-                    d.getResolver().reject(result.cause());
+                    d.reject(result.cause());
                 }
             }
         });
@@ -231,13 +195,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public <T> Promise<Message<T>> send(String address, String message) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.send(address, message, new Handler<Message<T>>() {
-            @Override
-            public void handle(Message<T> reply) {
-                d.getResolver().resolve(reply);
-            }
-        });
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.send(address, message, (Message<T> reply) -> d.resolve(reply));
         return d.getPromise();
     }
 
@@ -250,15 +209,12 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> sendWithTimeout(String address, String message, long timeout) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
-            @Override
-            public void handle(AsyncResult<Message<T>> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    d.getResolver().reject(result.cause());
-                }
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.sendWithTimeout(address, message, timeout, (AsyncResult<Message<T>> result) -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -266,13 +222,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public <T> Promise<Message<T>> send(String address, Integer message) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.send(address, message, new Handler<Message<T>>() {
-            @Override
-            public void handle(Message<T> reply) {
-                d.getResolver().resolve(reply);
-            }
-        });
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.send(address, message, (Message<T> reply) -> d.resolve(reply));
         return d.getPromise();
     }
 
@@ -285,15 +236,12 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> sendWithTimeout(String address, Integer message, long timeout) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
-            @Override
-            public void handle(AsyncResult<Message<T>> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    d.getResolver().reject(result.cause());
-                }
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.sendWithTimeout(address, message, timeout, (AsyncResult<Message<T>> result) -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -301,13 +249,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public <T> Promise<Message<T>> send(String address, Long message) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.send(address, message, new Handler<Message<T>>() {
-            @Override
-            public void handle(Message<T> reply) {
-                d.getResolver().resolve(reply);
-            }
-        });
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.send(address, message, (Message<T> reply) -> d.resolve(reply));
         return d.getPromise();
     }
 
@@ -320,15 +263,12 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> sendWithTimeout(String address, Long message, long timeout) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
-            @Override
-            public void handle(AsyncResult<Message<T>> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    d.getResolver().reject(result.cause());
-                }
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.sendWithTimeout(address, message, timeout, (AsyncResult<Message<T>> result) -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -336,13 +276,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public <T> Promise<Message<T>> send(String address, Float message) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.send(address, message, new Handler<Message<T>>() {
-            @Override
-            public void handle(Message<T> reply) {
-                d.getResolver().resolve(reply);
-            }
-        });
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.send(address, message, (Message<T> reply) -> d.resolve(reply));
         return d.getPromise();
     }
 
@@ -355,15 +290,12 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> sendWithTimeout(String address, Float message, long timeout) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
-            @Override
-            public void handle(AsyncResult<Message<T>> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    d.getResolver().reject(result.cause());
-                }
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.sendWithTimeout(address, message, timeout, (AsyncResult<Message<T>> result) -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -371,13 +303,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public <T> Promise<Message<T>> send(String address, Double message) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.send(address, message, new Handler<Message<T>>() {
-            @Override
-            public void handle(Message<T> reply) {
-                d.getResolver().resolve(reply);
-            }
-        });
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.send(address, message, (Message<T> reply) -> d.resolve(reply));
         return d.getPromise();
     }
 
@@ -390,15 +317,12 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> sendWithTimeout(String address, Double message, long timeout) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
-            @Override
-            public void handle(AsyncResult<Message<T>> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    d.getResolver().reject(result.cause());
-                }
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.sendWithTimeout(address, message, timeout, (AsyncResult<Message<T>> result) -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -406,13 +330,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public <T> Promise<Message<T>> send(String address, Boolean message) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.send(address, message, new Handler<Message<T>>() {
-            @Override
-            public void handle(Message<T> reply) {
-                d.getResolver().resolve(reply);
-            }
-        });
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.send(address, message, (Message<T> reply) -> d.resolve(reply));
         return d.getPromise();
     }
 
@@ -425,15 +344,12 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> sendWithTimeout(String address, Boolean message, long timeout) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
-            @Override
-            public void handle(AsyncResult<Message<T>> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    d.getResolver().reject(result.cause());
-                }
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.sendWithTimeout(address, message, timeout, (AsyncResult<Message<T>> result) -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -441,13 +357,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public <T> Promise<Message<T>> send(String address, Short message) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.send(address, message, new Handler<Message<T>>() {
-            @Override
-            public void handle(Message<T> reply) {
-                d.getResolver().resolve(reply);
-            }
-        });
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.send(address, message, (Message<T> reply) -> d.resolve(reply));
         return d.getPromise();
     }
 
@@ -460,15 +371,12 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> sendWithTimeout(String address, Short message, long timeout) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
-            @Override
-            public void handle(AsyncResult<Message<T>> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    d.getResolver().reject(result.cause());
-                }
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.sendWithTimeout(address, message, timeout, (AsyncResult<Message<T>> result) -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -476,13 +384,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public <T> Promise<Message<T>> send(String address, Character message) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.send(address, message, new Handler<Message<T>>() {
-            @Override
-            public void handle(Message<T> reply) {
-                d.getResolver().resolve(reply);
-            }
-        });
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.send(address, message, (Message<T> reply) -> d.resolve(reply));
         return d.getPromise();
     }
 
@@ -495,15 +398,12 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> sendWithTimeout(String address, Character message, long timeout) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
-            @Override
-            public void handle(AsyncResult<Message<T>> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    d.getResolver().reject(result.cause());
-                }
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.sendWithTimeout(address, message, timeout, (AsyncResult<Message<T>> result) -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -511,13 +411,8 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public <T> Promise<Message<T>> send(String address, Byte message) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.send(address, message, new Handler<Message<T>>() {
-            @Override
-            public void handle(Message<T> reply) {
-                d.getResolver().resolve(reply);
-            }
-        });
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.send(address, message, (Message<T> reply) -> d.resolve(reply));
         return d.getPromise();
     }
 
@@ -530,15 +425,12 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> sendWithTimeout(String address, Byte message, long timeout) {
-        final Deferred<Message<T>> d = new When<Message<T>>().defer();
-        eventBus.sendWithTimeout(address, message, timeout, new Handler<AsyncResult<Message<T>>>() {
-            @Override
-            public void handle(AsyncResult<Message<T>> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve(result.result());
-                } else {
-                    d.getResolver().reject(result.cause());
-                }
+        final Deferred<Message<T>> d = when.defer();
+        eventBus.sendWithTimeout(address, message, timeout, (AsyncResult<Message<T>> result) -> {
+            if (result.succeeded()) {
+                d.resolve(result.result());
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -546,15 +438,12 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public Promise<Void> unregisterHandler(String address, Handler<? extends Message> handler) {
-        final Deferred<Void> d = new When<Void>().defer();
-        eventBus.unregisterHandler(address, handler, new Handler<AsyncResult<Void>>() {
-            @Override
-            public void handle(AsyncResult<Void> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve((Void) null);
-                } else {
-                    d.getResolver().reject(new Value<Void>(null, new RuntimeException(result.cause())));
-                }
+        final Deferred<Void> d = when.defer();
+        eventBus.unregisterHandler(address, handler, result -> {
+            if (result.succeeded()) {
+                d.resolve((Void) null);
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
@@ -562,15 +451,12 @@ public class DefaultWhenEventBus implements WhenEventBus {
 
     @Override
     public Promise<Void> registerHandler(String address, Handler<? extends Message> handler) {
-        final Deferred<Void> d = new When<Void>().defer();
-        eventBus.registerHandler(address, handler, new Handler<AsyncResult<Void>>() {
-            @Override
-            public void handle(AsyncResult<Void> result) {
-                if (result.succeeded()) {
-                    d.getResolver().resolve((Void) null);
-                } else {
-                    d.getResolver().reject(new Value<Void>(null, new RuntimeException(result.cause())));
-                }
+        final Deferred<Void> d = when.defer();
+        eventBus.registerHandler(address, handler, (AsyncResult<Void> result) -> {
+            if (result.succeeded()) {
+                d.resolve((Void) null);
+            } else {
+                d.reject(result.cause());
             }
         });
         return d.getPromise();
