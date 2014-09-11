@@ -98,7 +98,7 @@ when.all(promises).then(
 
 ```java
 
-whenHttpClient.requestResponseBody(HttpMethod.GET.name(), URI.create("http://localhost:8888/test")).then(
+whenHttpClient.requestResponseBody(HttpMethod.GET.name(), URI.create("http://localhost:8081/test")).then(
     result -> {
         HttpClientResponse response = result.getResponse();
         Buffer body = result.getBody();

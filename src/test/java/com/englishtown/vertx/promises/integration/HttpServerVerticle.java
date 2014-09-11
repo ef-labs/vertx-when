@@ -22,7 +22,7 @@ public class HttpServerVerticle extends Verticle implements Handler<HttpServerRe
      */
     @Override
     public void start(final Future<Void> startedResult) {
-        vertx.createHttpServer().requestHandler(this).listen(8888, "localhost", new Handler<AsyncResult<HttpServer>>() {
+        vertx.createHttpServer().requestHandler(this).listen(8081, "localhost", new Handler<AsyncResult<HttpServer>>() {
             @Override
             public void handle(AsyncResult<HttpServer> result) {
                 if (result.succeeded()) {
