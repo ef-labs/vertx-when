@@ -12,10 +12,13 @@ import io.netty.handler.codec.http.HttpMethod;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.ServiceLocatorFactory;
 import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.junit.Test;
+import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpClientResponse;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.platform.Container;
 import org.vertx.testtools.TestVerticle;
 
 import java.net.URI;
@@ -33,7 +36,13 @@ public class IntegrationTest extends TestVerticle {
     public void start() {
 
         ServiceLocator locator = ServiceLocatorFactory.getInstance().create(null);
-        ServiceLocatorUtilities.bind(locator, new HK2WhenBinder());
+        ServiceLocatorUtilities.bind(locator, new HK2WhenBinder(), new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(vertx).to(Vertx.class);
+                bind(container).to(Container.class);
+            }
+        });
 
         when = locator.getService(When.class);
         super.start();
@@ -87,7 +96,7 @@ public class IntegrationTest extends TestVerticle {
 
         container.deployVerticle(HttpServerVerticle.class.getName(), result -> {
             if (result.succeeded()) {
-                whenHttpClient.request(HttpMethod.GET.name(), URI.create("http://localhost:8888/test")).then(
+                whenHttpClient.request(HttpMethod.GET.name(), URI.create("http://localhost:8081/test")).then(
                         response -> {
                             assertEquals(200, response.statusCode());
                             testComplete();
@@ -112,7 +121,7 @@ public class IntegrationTest extends TestVerticle {
         container.deployVerticle(HttpServerVerticle.class.getName(), result -> {
             if (result.succeeded()) {
 
-                whenHttpClient.requestResponseBody(HttpMethod.GET.name(), URI.create("http://localhost:8888/test")).then(
+                whenHttpClient.requestResponseBody(HttpMethod.GET.name(), URI.create("http://localhost:8081/test")).then(
                         responseAndBody -> {
                             HttpClientResponse response = responseAndBody.getResponse();
                             Buffer body = responseAndBody.getBody();
