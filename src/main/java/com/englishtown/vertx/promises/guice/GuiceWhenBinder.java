@@ -1,17 +1,16 @@
 package com.englishtown.vertx.promises.guice;
 
+import com.englishtown.promises.guice.WhenBinder;
 import com.englishtown.vertx.promises.WhenContainer;
 import com.englishtown.vertx.promises.WhenEventBus;
 import com.englishtown.vertx.promises.WhenHttpClient;
 import com.englishtown.vertx.promises.WhenPlatformManager;
 import com.englishtown.vertx.promises.impl.*;
 import com.google.inject.AbstractModule;
-
-import javax.inject.Singleton;
-import java.util.concurrent.Executor;
+import com.google.inject.util.Modules;
 
 /**
- * Created by adriangonzalez on 9/11/14.
+ * Guice vertx-mod-when binder
  */
 public class GuiceWhenBinder extends AbstractModule {
     /**
@@ -20,11 +19,9 @@ public class GuiceWhenBinder extends AbstractModule {
     @Override
     protected void configure() {
 
-        install(new com.englishtown.promises.guice.WhenBinder());
+        install(Modules.override(new WhenBinder()).with(new OverridesGuiceWhenBinder()));
 
-        bind(Executor.class).to(VertxExecutor.class).in(Singleton.class);
-
-        bind(WhenPlatformManager.class).to(DefaultWhenPlatformManager.class);
+//        bind(WhenPlatformManager.class).to(DefaultWhenPlatformManager.class);
         bind(WhenContainer.class).to(DefaultWhenContainer.class);
         bind(WhenEventBus.class).to(DefaultWhenEventBus.class);
         bind(WhenHttpClient.class).to(DefaultWhenHttpClient.class);
