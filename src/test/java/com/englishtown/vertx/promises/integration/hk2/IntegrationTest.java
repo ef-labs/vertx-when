@@ -1,4 +1,4 @@
-package com.englishtown.vertx.promises.integration;
+package com.englishtown.vertx.promises.integration.hk2;
 
 import com.englishtown.promises.When;
 import com.englishtown.vertx.promises.WhenContainer;
@@ -8,6 +8,8 @@ import com.englishtown.vertx.promises.hk2.HK2WhenBinder;
 import com.englishtown.vertx.promises.impl.DefaultWhenContainer;
 import com.englishtown.vertx.promises.impl.DefaultWhenEventBus;
 import com.englishtown.vertx.promises.impl.DefaultWhenHttpClient;
+import com.englishtown.vertx.promises.integration.EventBusVerticle;
+import com.englishtown.vertx.promises.integration.HttpServerVerticle;
 import io.netty.handler.codec.http.HttpMethod;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.ServiceLocatorFactory;
