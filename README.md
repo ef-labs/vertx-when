@@ -1,47 +1,46 @@
-# vertx-mod-when
+[![Build Status](https://travis-ci.org/englishtown/vertx-mod-jersey.png)](https://travis-ci.org/englishtown/vertx-mod-jersey)
+
+# ext-when
 
 Provides when.java wrappers for standard vert.x objects to return promises.
 
 
-## WhenContainer Examples
+## WhenVertx Examples
 
 ### Deploy 1 Verticle
 
 ```java
 
 whenContainer.deployVerticle("com.englishtown.vertx.TestVerticle")
-    .then(
-           value -> {
-                // On success
-                return null;
-            },
-            value -> {
-                // On fail
-                return null;
-            }
-    );
+    .then(deploymentID -> {
+        // On success
+        return null;
+    })
+    .otherwise(t -> {
+        // On fail
+        return null;
+    });
 
 ```
 
-### Deploy 2 Modules
+### Deploy 2 Verticles
 
 ```java
 
 List<Promise<String>> promises = new ArrayList<>();
 
-promises.add(whenContainer.deployModule("com.englishtown~vertx-mod-hk2~1.5.0-final"));
-promises.add(whenContainer.deployModule("com.englishtown~vertx-mod-jersey~2.3.0-final"));
+promises.add(whenContainer.deployVerticle("com.englishtown.vertx.TestVerticle1"));
+promises.add(whenContainer.deployVerticle("com.englishtown.vertx.TestVerticle2"));
 
-when.all(promises,
-        value -> {
-            // On success
-            return null;
-        },
-        value -> {
-            // On fail
-            return null;
-        }
-);
+when.all(promises)
+    .then(deploymentIDs -> {
+        // Handle success
+        return null;
+    })
+    .otherwise(t -> {
+        // Handle failure
+        return null;
+    });
 
 ```
 
@@ -58,11 +57,11 @@ promises.add(whenEventBus.<JsonObject>send("et.vertx.eb.1", new JsonObject().put
 promises.add(whenEventBus.<JsonObject>send("et.vertx.eb.2", new JsonObject().putString("message", "world")));
 
 when.all(promises).then(
-        value -> {
+        replies -> {
             // On success
             return null;
         },
-        value -> {
+        t -> {
             // On fail
             return null;
         });
@@ -78,15 +77,15 @@ when.all(promises).then(
 
 List<Promise<HttpClientResponse>> promises = new ArrayList<>();
 
-promises.add(whenHttpClient.request(HttpMethod.GET.name(), URI.create("http://test.englishtown.com/test1")));
-promises.add(whenHttpClient.request(HttpMethod.POST.name(), URI.create("http://test.englishtown.com/test2")));
+promises.add(whenHttpClient.request(HttpMethod.GET, "http://test.englishtown.com/test1", new HttpClientOptions()));
+promises.add(whenHttpClient.request(HttpMethod.POST, "http://test.englishtown.com/test2", new HttpClientOptions()));
 
 when.all(promises).then(
-        value -> {
+        responses -> {
             // On success
             return null;
         },
-        value -> {
+        t -> {
             // On fail
             return null;
         }
@@ -98,7 +97,7 @@ when.all(promises).then(
 
 ```java
 
-whenHttpClient.requestResponseBody(HttpMethod.GET.name(), URI.create("http://localhost:8081/test")).then(
+whenHttpClient.requestResponseBody(HttpMethod.GET, "http://localhost:8081/test", new HttpClientOptions()).then(
     result -> {
         HttpClientResponse response = result.getResponse();
         Buffer body = result.getBody();
