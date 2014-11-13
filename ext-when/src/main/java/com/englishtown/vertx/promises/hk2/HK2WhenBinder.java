@@ -10,7 +10,7 @@ import javax.inject.Singleton;
 import java.util.concurrent.Executor;
 
 /**
- * HK2 binder for vertx-mod-when
+ * HK2 binder for ext-when
  */
 public class HK2WhenBinder extends AbstractBinder {
     /**
@@ -24,9 +24,9 @@ public class HK2WhenBinder extends AbstractBinder {
 
         bind(VertxExecutor.class).to(Executor.class).in(Singleton.class).ranked(10);
 
-        bind(DefaultWhenVertx.class).to(WhenVertx.class);
-        bind(DefaultWhenEventBus.class).to(WhenEventBus.class);
-        bind(DefaultWhenHttpClient.class).to(WhenHttpClient.class);
+        bind(DefaultWhenVertx.class).to(WhenVertx.class).in(Singleton.class);
+        bind(DefaultWhenEventBus.class).to(WhenEventBus.class).in(Singleton.class);
+        bind(DefaultWhenHttpClient.class).to(WhenHttpClient.class).in(Singleton.class);
 
     }
 }

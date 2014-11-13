@@ -8,8 +8,10 @@ import com.englishtown.vertx.promises.impl.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.util.Modules;
 
+import javax.inject.Singleton;
+
 /**
- * Guice vertx-mod-when binder
+ * Guice ext-when binder
  */
 public class GuiceWhenBinder extends AbstractModule {
     /**
@@ -20,9 +22,9 @@ public class GuiceWhenBinder extends AbstractModule {
 
         install(Modules.override(new WhenBinder()).with(new OverridesGuiceWhenBinder()));
 
-        bind(WhenVertx.class).to(DefaultWhenVertx.class);
-        bind(WhenEventBus.class).to(DefaultWhenEventBus.class);
-        bind(WhenHttpClient.class).to(DefaultWhenHttpClient.class);
+        bind(WhenVertx.class).to(DefaultWhenVertx.class).in(Singleton.class);
+        bind(WhenEventBus.class).to(DefaultWhenEventBus.class).in(Singleton.class);
+        bind(WhenHttpClient.class).to(DefaultWhenHttpClient.class).in(Singleton.class);
 
     }
 }

@@ -7,7 +7,7 @@ import javax.inject.Singleton;
 import java.util.concurrent.Executor;
 
 /**
- * Internal binder for vertx-mod-when that overrides the when.java binder
+ * Internal binder for ext-when that overrides the when.java binder
  */
 class OverridesGuiceWhenBinder extends AbstractModule {
     /**
