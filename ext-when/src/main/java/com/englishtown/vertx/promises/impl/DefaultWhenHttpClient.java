@@ -2,22 +2,16 @@ package com.englishtown.vertx.promises.impl;
 
 import com.englishtown.promises.Deferred;
 import com.englishtown.promises.Promise;
+import com.englishtown.promises.Resolver;
 import com.englishtown.promises.When;
-import com.englishtown.promises.exceptions.RejectException;
-import com.englishtown.vertx.promises.HttpClientResponseAndBody;
+import com.englishtown.vertx.promises.RequestOptions;
 import com.englishtown.vertx.promises.WhenHttpClient;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.*;
-import io.vertx.core.streams.Pump;
-import io.vertx.core.streams.WriteStream;
 
 import javax.inject.Inject;
-import java.net.URI;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Default implementation of {@link WhenHttpClient}
@@ -33,326 +27,111 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
         this.when = when;
     }
 
-    /**
-     * Send a Vertx http client request and returns a promise
-     *
-     * @param method the http method (GET, PUT, POST etc.)
-     * @param absoluteUri    the {@link java.net.URI} to send the request to
-     * @return a promise for the HttpClientResponse
-     */
     @Override
-    public Promise<HttpClientResponse> request(HttpMethod method, String absoluteUri, HttpClientOptions options) {
-        return request(method, absoluteUri, options, null);
+    public Promise<HttpClientResponse> request(HttpMethod method, String absoluteURI) {
+        return request(method, absoluteURI, null);
     }
 
-    /**
-     * Send a Vertx http client request and returns a promise
-     *
-     * @param method       the http method (GET, PUT, POST etc.)
-     * @param absoluteUri          the {@link java.net.URI} to send the request to
-     * @param setupHandler optional setup handler.  If provided it must call end() on the {@link io.vertx.core.http.HttpClientRequest}
-     * @return a promise for the HttpClientResponse
-     */
     @Override
-    public Promise<HttpClientResponse> request(HttpMethod method, String absoluteUri, HttpClientOptions options, Handler<HttpClientRequest> setupHandler) {
-        return request(method, absoluteUri, options, setupHandler, null);
+    public Promise<HttpClientResponse> request(HttpMethod method, String absoluteURI, RequestOptions options) {
+
+        if (options == null) {
+            options = new RequestOptions();
+        }
+
+        Deferred<HttpClientResponse> d = when.defer();
+
+        HttpClientRequest request = getClient(options)
+                .request(method, absoluteURI, getResponseHandler(options, d))
+                .exceptionHandler(d::reject);
+
+        return doRequest(request, options, d);
     }
 
-    /**
-     * Send a Vertx http client request and returns a promise
-     *
-     * @param method       the http method (GET, PUT, POST etc.)
-     * @param absoluteUri          the absolute {@link java.net.URI} to send the request to
-     * @param setupHandler optional setup handler.  If provided it must call end() on the {@link io.vertx.core.http.HttpClientRequest}
-     * @param writeStream  optional write stream to write response data to
-     * @return a promise for the HttpClientResponse
-     */
     @Override
-    public Promise<HttpClientResponse> request(HttpMethod method, String absoluteUri, HttpClientOptions options, Handler<HttpClientRequest> setupHandler, WriteStream<Buffer> writeStream) {
-        return request(method, absoluteUri, options, setupHandler, writeStream, null);
+    public Promise<HttpClientResponse> request(HttpMethod method, int port, String host, String requestURI) {
+        return request(method, port, host, requestURI, null);
     }
 
-    /**
-     * Send a Vertx http client request and returns a promise
-     *
-     * @param method           the http method (GET, PUT, POST etc.)
-     * @param absoluteUri      the absolute {@link java.net.URI} to send the request to
-     * @param setupHandler     optional setup handler.  If provided it must call end() on the {@link io.vertx.core.http.HttpClientRequest}
-     * @param writeStream      optional write stream to write response data to
-     * @param expectedStatuses optional set of expected statuses that will trigger the fulfilled callback
-     * @return a promise for the HttpClientResponse
-     */
     @Override
-    public Promise<HttpClientResponse> request(HttpMethod method, String absoluteUri, HttpClientOptions options, Handler<HttpClientRequest> setupHandler, WriteStream<Buffer> writeStream, Set<Integer> expectedStatuses) {
+    public Promise<HttpClientResponse> request(HttpMethod method, int port, String host, String requestURI, RequestOptions options) {
 
-        final Deferred<HttpClientResponse> d = when.defer();
+        if (options == null) {
+            options = new RequestOptions();
+        }
 
-        try {
-            HttpClient client = createClient(options, d);
-            return request(d, method, absoluteUri, client, setupHandler, writeStream, expectedStatuses);
+        Deferred<HttpClientResponse> d = when.defer();
 
-        } catch (Throwable t) {
-            d.reject(t);
+        HttpClientRequest request = getClient(options)
+                .request(method, port, host, requestURI, getResponseHandler(options, d))
+                .exceptionHandler(d::reject);
+
+        return doRequest(request, options, d);
+    }
+
+    private HttpClient getClient(RequestOptions options) {
+        if (options.getClient() != null) {
+            return options.getClient();
+        }
+        if (options.getClientOptions() != null) {
+            return vertx.createHttpClient(options.getClientOptions());
+        }
+        return vertx.createHttpClient(new HttpClientOptions());
+    }
+
+    private Handler<HttpClientResponse> getResponseHandler(RequestOptions options, Resolver<HttpClientResponse> resolver) {
+        return response -> {
+            if (options.getPauseResponse()) {
+                response.pause();
+            }
+            resolver.resolve(response);
+        };
+    }
+
+    private Promise<HttpClientResponse> doRequest(HttpClientRequest request, RequestOptions options, Deferred<HttpClientResponse> d) {
+
+        if (options.getChunked()) {
+            request.setChunked(true);
+        }
+        if (options.getHeaders() != null) {
+            request.headers().addAll(options.getHeaders());
+        }
+        if (options.getTimeout() > 0) {
+            request.setTimeout(options.getTimeout());
+        }
+        if (options.getWriteQueueMaxSize() > 0) {
+            request.setWriteQueueMaxSize(options.getWriteQueueMaxSize());
+        }
+
+        if (options.getSetupHandler() != null) {
+            return when.resolve(options.getSetupHandler().apply(request))
+                    .then(aVoid -> {
+                        end(request, options);
+                        return d.getPromise();
+                    });
+        } else {
+            end(request, options);
             return d.getPromise();
         }
 
     }
 
-    /**
-     * Send a Vertx http client request and returns a promise
-     *
-     * @param method the http method (GET, PUT, POST etc.)
-     * @param url    the url to send the request to
-     * @param client the vertx http client to use
-     * @return a promise for the HttpClientResponse
-     */
-    @Override
-    public Promise<HttpClientResponse> request(HttpMethod method, String url, HttpClient client) {
-        return request(method, url, client, null);
-    }
-
-    /**
-     * Send a Vertx http client request and returns a promise
-     *
-     * @param method       the http method (GET, PUT, POST etc.)
-     * @param url          the url to send the request to
-     * @param client       the vertx http client to use
-     * @param setupHandler optional setup handler.  If provided it must call end() on the {@link io.vertx.core.http.HttpClientRequest}
-     * @return a promise for the HttpClientResponse
-     */
-    @Override
-    public Promise<HttpClientResponse> request(HttpMethod method, String url, HttpClient client, Handler<HttpClientRequest> setupHandler) {
-        return request(method, url, client, setupHandler, null);
-    }
-
-    /**
-     * Send a Vertx http client request and returns a promise
-     *
-     * @param method       the http method (GET, PUT, POST etc.)
-     * @param url          the url to send the request to
-     * @param client       the vertx http client to use
-     * @param setupHandler optional setup handler.  If provided it must call end() on the {@link io.vertx.core.http.HttpClientRequest}
-     * @param writeStream  optional write stream to write response data to
-     * @return a promise for the HttpClientResponse
-     */
-    @Override
-    public Promise<HttpClientResponse> request(HttpMethod method, String url, HttpClient client, Handler<HttpClientRequest> setupHandler, WriteStream<Buffer> writeStream) {
-        return request(method, url, client, setupHandler, writeStream, null);
-    }
-
-    /**
-     * Send a Vertx http client request and returns a promise
-     *
-     * @param method           the http method (GET, PUT, POST etc.)
-     * @param absoluteUri              the url to send the request to
-     * @param client           the vertx http client to use
-     * @param setupHandler     optional setup handler.  If provided it must call end() on the {@link io.vertx.core.http.HttpClientRequest}
-     * @param writeStream      optional write stream to write response data to
-     * @param expectedStatuses set of expected statuses that will trigger the fulfilled callback
-     * @return a promise for the HttpClientResponse
-     */
-    @Override
-    public Promise<HttpClientResponse> request(HttpMethod method, String absoluteUri, HttpClient client, Handler<HttpClientRequest> setupHandler, WriteStream<Buffer> writeStream, Set<Integer> expectedStatuses) {
-        final Deferred<HttpClientResponse> d = when.defer();
-        return request(d, method, absoluteUri, client, setupHandler, writeStream, expectedStatuses);
-    }
-
-    /**
-     * Send a Vertx http client request and returns a promise for the response and full body
-     *
-     * @param method the http method (GET, PUT, POST etc.)
-     * @param absoluteUri    the {@link java.net.URI} to send the request to
-     * @return a promise for the HttpClientResponseAndBody
-     */
-    @Override
-    public Promise<HttpClientResponseAndBody> requestResponseBody(HttpMethod method, String absoluteUri, HttpClientOptions options) {
-        return requestResponseBody(method, absoluteUri, options, null);
-    }
-
-    /**
-     * Send a Vertx http client request and returns a promise for the response and full body
-     *
-     * @param method       the http method (GET, PUT, POST etc.)
-     * @param absoluteUri          the absolute {@link java.net.URI} to send the request to
-     * @param setupHandler optional setup handler.  If provided it must call end() on the {@link io.vertx.core.http.HttpClientRequest}
-     * @return a promise for the HttpClientResponseAndBody
-     */
-    @Override
-    public Promise<HttpClientResponseAndBody> requestResponseBody(HttpMethod method, String absoluteUri, HttpClientOptions options, Handler<HttpClientRequest> setupHandler) {
-        return requestResponseBody(method, absoluteUri, options, setupHandler, null);
-    }
-
-    /**
-     * Send a Vertx http client request and returns a promise for the response and full body
-     *
-     * @param method           the http method (GET, PUT, POST etc.)
-     * @param absoluteUri      the absolute {@link java.net.URI} to send the request to
-     * @param setupHandler     optional setup handler.  If provided it must call end() on the {@link io.vertx.core.http.HttpClientRequest}
-     * @param expectedStatuses optional set of expected statuses that will trigger the fulfilled callback
-     * @return a promise for the HttpClientResponseAndBody
-     */
-    @Override
-    public Promise<HttpClientResponseAndBody> requestResponseBody(HttpMethod method, String absoluteUri, HttpClientOptions options, Handler<HttpClientRequest> setupHandler, Set<Integer> expectedStatuses) {
-        final Deferred<HttpClientResponseAndBody> d = when.defer();
-
-        try {
-            HttpClient client = createClient(options, d);
-            return requestResponseBody(d, method, absoluteUri, client, setupHandler, expectedStatuses);
-
-        } catch (Throwable t) {
-            d.reject(t);
-            return d.getPromise();
+    private void end(HttpClientRequest request, RequestOptions options) {
+        if (options.getData() != null) {
+            request.end(options.getData());
+        } else {
+            request.end();
         }
     }
 
-    /**
-     * Send a Vertx http client request and returns a promise for the response and full body
-     *
-     * @param method the http method (GET, PUT, POST etc.)
-     * @param url    the url to send the request to
-     * @param client the vertx http client to use
-     * @return a promise for the HttpClientResponseAndBody
-     */
     @Override
-    public Promise<HttpClientResponseAndBody> requestResponseBody(HttpMethod method, String url, HttpClient client) {
-        return requestResponseBody(method, url, client, null);
-    }
+    public Promise<Buffer> body(HttpClientResponse response) {
+        Deferred<Buffer> d = when.defer();
 
-    /**
-     * Send a Vertx http client request and returns a promise for the response and full body
-     *
-     * @param method       the http method (GET, PUT, POST etc.)
-     * @param url          the url to send the request to
-     * @param client       the vertx http client to use
-     * @param setupHandler optional setup handler.  If provided it must call end() on the {@link io.vertx.core.http.HttpClientRequest}
-     * @return a promise for the HttpClientResponseAndBody
-     */
-    @Override
-    public Promise<HttpClientResponseAndBody> requestResponseBody(HttpMethod method, String url, HttpClient client, Handler<HttpClientRequest> setupHandler) {
-        return requestResponseBody(method, url, client, setupHandler, null);
-    }
-
-    /**
-     * Send a Vertx http client request and returns a promise for the response and full body
-     *
-     * @param method           the http method (GET, PUT, POST etc.)
-     * @param url              the url to send the request to
-     * @param client           the vertx http client to use
-     * @param setupHandler     optional setup handler.  If provided it must call end() on the {@link io.vertx.core.http.HttpClientRequest}
-     * @param expectedStatuses set of expected statuses that will trigger the fulfilled callback
-     * @return a promise for the HttpClientResponseAndBody
-     */
-    @Override
-    public Promise<HttpClientResponseAndBody> requestResponseBody(HttpMethod method, String url, HttpClient client, Handler<HttpClientRequest> setupHandler, Set<Integer> expectedStatuses) {
-        final Deferred<HttpClientResponseAndBody> d = when.defer();
-        return requestResponseBody(d, method, url, client, setupHandler, expectedStatuses);
-    }
-
-    protected Promise<HttpClientResponse> request(
-            final Deferred<HttpClientResponse> d,
-            HttpMethod method,
-            String absoluteUri,
-            HttpClient client,
-            Handler<HttpClientRequest> setupHandler,
-            final WriteStream<Buffer> writeStream,
-            Set<Integer> expectedStatuses) {
-
-        if (expectedStatuses == null || expectedStatuses.isEmpty()) {
-            expectedStatuses = new HashSet<>();
-            expectedStatuses.add(HttpResponseStatus.OK.code());
-        }
-
-        final Set<Integer> finalExpectedStatuses = expectedStatuses;
-
-        try {
-            HttpClientRequest request = client.request(method, absoluteUri, response -> {
-                // Short circuit, no need to wait for response end
-                if (writeStream == null) {
-                    if (finalExpectedStatuses.contains(response.statusCode())) {
-                        d.resolve(response);
-                    } else {
-                        d.reject(new RejectException().setValue(response));
-                    }
-                    return;
-                }
-
-                Pump.pump(response, writeStream).start();
-
-                response.endHandler(event -> {
-                    if (finalExpectedStatuses.contains(response.statusCode())) {
-                        d.resolve(response);
-                    } else {
-                        d.reject(new RejectException().setValue(response));
-                    }
-                });
-            });
-
-            request.exceptionHandler(t -> d.reject(t));
-
-            if (setupHandler != null) {
-                setupHandler.handle(request);
-            } else {
-                request.end();
-            }
-
-        } catch (Throwable t) {
-            d.reject(t);
-        }
+        // Set the body handler and resume the response
+        response.bodyHandler(d::resolve).resume();
 
         return d.getPromise();
-
-    }
-
-    protected Promise<HttpClientResponseAndBody> requestResponseBody(
-            final Deferred<HttpClientResponseAndBody> d,
-            HttpMethod method,
-            String absoluteUri,
-            HttpClient client,
-            Handler<HttpClientRequest> setupHandler,
-            Set<Integer> expectedStatuses) {
-
-        if (expectedStatuses == null || expectedStatuses.isEmpty()) {
-            expectedStatuses = new HashSet<>();
-            expectedStatuses.add(HttpResponseStatus.OK.code());
-        }
-
-        final Set<Integer> finalExpectedStatuses = expectedStatuses;
-
-        try {
-            HttpClientRequest request = client.request(method, absoluteUri,
-                    response -> response.bodyHandler(
-                            body -> {
-                                HttpClientResponseAndBody responseAndBody = new DefaultHttpClientResponseAndBody(response, body);
-                                if (finalExpectedStatuses.contains(response.statusCode())) {
-                                    d.resolve(responseAndBody);
-                                } else {
-                                    d.reject(new RejectException().setValue(responseAndBody));
-                                }
-                            }
-                    )
-            );
-
-            request.exceptionHandler(t -> d.reject(t));
-
-            if (setupHandler != null) {
-                setupHandler.handle(request);
-            } else {
-                request.end();
-            }
-
-        } catch (Throwable t) {
-            d.reject(t);
-        }
-
-        return d.getPromise();
-
-    }
-
-    protected <T> HttpClient createClient(HttpClientOptions options, final Deferred<T> d) {
-
-        return vertx.createHttpClient(options)
-                .exceptionHandler(t -> d.reject(t));
-
     }
 
 }

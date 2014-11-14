@@ -1,14 +1,8 @@
 package com.englishtown.vertx.promises;
 
 import com.englishtown.promises.Promise;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Handler;
 import io.vertx.core.Verticle;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-
-import java.util.List;
 
 /**
  * When.java wrapper over {@link io.vertx.core.Vertx} async operations
