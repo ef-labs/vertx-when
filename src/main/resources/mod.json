@@ -1,7 +1,0 @@
-{
-    "description":"Provides when.java wrappers for standard vert.x objects to return promises.",
-    "licenses": ["The MIT License"],
-    "author": "Englishtown",
-    "keywords": ["when", "when.java", "promises"],
-    "homepage": "https://github.com/englishtown/vertx-mod-when"
-}

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>vertx-when-parent</artifactId>
+        <groupId>com.englishtown.vertx</groupId>
+        <version>4.0.0-RC1</version>
+    </parent>
+
+    <artifactId>vertx-when</artifactId>
+
+    <properties>
+        <!--Dependency versions-->
+        <when.java.version>3.0.1</when.java.version>
+        <vertx.hk2.version>2.0.0-RC1</vertx.hk2.version>
+        <vertx.guice.version>2.0.0-RC1</vertx.guice.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.englishtown</groupId>
+            <artifactId>when.java</artifactId>
+            <version>${when.java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>vertx-hk2</artifactId>
+            <version>${vertx.hk2.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>vertx-guice</artifactId>
+            <version>${vertx.guice.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--Test dependencies-->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.englishtown</groupId>
+            <artifactId>when.java-testtools</artifactId>
+            <version>${when.java.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>
