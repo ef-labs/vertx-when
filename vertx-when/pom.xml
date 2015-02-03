@@ -5,18 +5,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>vertx-when</artifactId>
+        <artifactId>vertx-when-parent</artifactId>
         <groupId>com.englishtown.vertx</groupId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ext-when</artifactId>
+    <artifactId>vertx-when</artifactId>
 
     <properties>
         <!--Dependency versions-->
         <when.java.version>3.0.1</when.java.version>
-        <vertx.ext.hk2.version>2.0.0-SNAPSHOT</vertx.ext.hk2.version>
-        <vertx.ext.guice.version>2.0.0-SNAPSHOT</vertx.ext.guice.version>
+        <vertx.hk2.version>2.0.0-RC1</vertx.hk2.version>
+        <vertx.guice.version>2.0.0-RC1</vertx.guice.version>
     </properties>
 
     <dependencies>
@@ -27,14 +27,14 @@
         </dependency>
         <dependency>
             <groupId>com.englishtown.vertx</groupId>
-            <artifactId>ext-hk2</artifactId>
-            <version>${vertx.ext.hk2.version}</version>
+            <artifactId>vertx-hk2</artifactId>
+            <version>${vertx.hk2.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.englishtown.vertx</groupId>
-            <artifactId>ext-guice</artifactId>
-            <version>${vertx.ext.guice.version}</version>
+            <artifactId>vertx-guice</artifactId>
+            <version>${vertx.guice.version}</version>
             <scope>provided</scope>
         </dependency>
 
