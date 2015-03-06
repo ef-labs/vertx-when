@@ -1,8 +1,49 @@
 [![Build Status](https://travis-ci.org/englishtown/vertx-when.png)](https://travis-ci.org/englishtown/vertx-when)
 
-# ext-when
+# when-when
 
-Provides when.java wrappers for standard vert.x objects to return promises.
+Provides when.java wrappers for standard vert.x 3 objects to return promises.
+
+## Getting Started
+
+Add a dependency to vertx-when
+
+```xml
+<dependency>
+    <groupId>com.englishtown.vertx</groupId>
+    <artifactId>vertx-when</artifactId>
+    <version>4.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+Use dependency injection (hk2 and guice binders provided) to get an instance of:
+* `com.englishtown.promises.When`
+* `com.englishtown.vertx.promises.WhenEventBus`
+* `com.englishtown.vertx.promises.WhenHttpClient`
+* `com.englishtown.vertx.promises.WhenVertx`
+
+If not using DI, you can manually construct the default implementations like this:
+```java
+        // Create the vert.x executor for callbacks to run on the vert.x event loop
+        VertxExecutor executor = new VertxExecutor(vertx);
+        when = WhenFactory.createFor(() -> executor);
+
+        whenVertx = new DefaultWhenVertx(vertx, when);
+        whenEventBus = new DefaultWhenEventBus(vertx, when);
+        whenHttpClient = new DefaultWhenHttpClient(vertx, when);
+```
+(See the `com.englishtown.vertx.promises.integration.simple.NoDIIntegrationTest` integration test for an example.)
+
+
+NOTE: If running vert.x 2.x then you should use module vertx-mod-when 3.0.1.  See earlier README.md files for details.
+
+```xml
+<dependency>
+    <groupId>com.englishtown</groupId>
+    <artifactId>vertx-mod-when</artifactId>
+    <version>3.0.1</version>
+</dependency>
+```
 
 
 ## WhenVertx Examples

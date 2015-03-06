@@ -10,7 +10,7 @@ import javax.inject.Singleton;
 import java.util.concurrent.Executor;
 
 /**
- * HK2 binder for ext-when
+ * HK2 binder for vertx-when
  */
 public class HK2WhenBinder extends AbstractBinder {
     /**

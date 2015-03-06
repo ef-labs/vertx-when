@@ -11,7 +11,7 @@ import com.google.inject.util.Modules;
 import javax.inject.Singleton;
 
 /**
- * Guice ext-when binder
+ * Guice vertx-when binder
  */
 public class GuiceWhenBinder extends AbstractModule {
     /**

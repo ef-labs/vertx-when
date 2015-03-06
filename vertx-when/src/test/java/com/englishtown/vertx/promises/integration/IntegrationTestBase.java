@@ -3,9 +3,9 @@ package com.englishtown.vertx.promises.integration;
 import com.englishtown.promises.Promise;
 import com.englishtown.promises.When;
 import com.englishtown.vertx.promises.RequestOptions;
-import com.englishtown.vertx.promises.impl.DefaultWhenEventBus;
-import com.englishtown.vertx.promises.impl.DefaultWhenHttpClient;
-import com.englishtown.vertx.promises.impl.DefaultWhenVertx;
+import com.englishtown.vertx.promises.WhenEventBus;
+import com.englishtown.vertx.promises.WhenHttpClient;
+import com.englishtown.vertx.promises.WhenVertx;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.test.core.VertxTestBase;
@@ -18,9 +18,9 @@ import org.junit.Test;
 public abstract class IntegrationTestBase extends VertxTestBase {
 
     protected When when;
-    protected DefaultWhenVertx whenVertx;
-    protected DefaultWhenEventBus whenEventBus;
-    protected DefaultWhenHttpClient whenHttpClient;
+    protected WhenVertx whenVertx;
+    protected WhenEventBus whenEventBus;
+    protected WhenHttpClient whenHttpClient;
 
     protected Promise<Void> onRejected(Throwable t) {
         t.printStackTrace();
