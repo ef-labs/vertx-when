@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/englishtown/vertx-when.png)](https://travis-ci.org/englishtown/vertx-when)
 
-# when-when
+# vertx-when
 
 Provides when.java wrappers for standard vert.x 3 objects to return promises.
 
@@ -16,11 +16,16 @@ Add a dependency to vertx-when
 </dependency>
 ```
 
-Use dependency injection (hk2 and guice binders provided) to get an instance of:
+Use dependency injection to get an instance of:
 * `com.englishtown.promises.When`
 * `com.englishtown.vertx.promises.WhenEventBus`
 * `com.englishtown.vertx.promises.WhenHttpClient`
 * `com.englishtown.vertx.promises.WhenVertx`
+
+[HK2](/englishtown/vertx-hk2) and [Guice](/englishtown/vertx-guice) binders are provided
+* `com.englishtown.vertx.promises.hk2.HK2WhenBinder`
+* `com.englishtown.vertx.promises.guice.GuiceWhenBinder`
+
 
 If not using DI, you can manually construct the default implementations like this:
 ```java
@@ -52,7 +57,7 @@ NOTE: If running vert.x 2.x then you should use module vertx-mod-when 3.0.1.  Se
 
 ```java
 
-whenContainer.deployVerticle("com.englishtown.vertx.TestVerticle")
+whenVertx.deployVerticle("com.englishtown.vertx.TestVerticle")
     .then(deploymentID -> {
         // On success
         return null;
@@ -70,8 +75,8 @@ whenContainer.deployVerticle("com.englishtown.vertx.TestVerticle")
 
 List<Promise<String>> promises = new ArrayList<>();
 
-promises.add(whenContainer.deployVerticle("com.englishtown.vertx.TestVerticle1"));
-promises.add(whenContainer.deployVerticle("com.englishtown.vertx.TestVerticle2"));
+promises.add(vertxWhen.deployVerticle("com.englishtown.vertx.TestVerticle1"));
+promises.add(vertxWhen.deployVerticle("com.englishtown.vertx.TestVerticle2"));
 
 when.all(promises)
     .then(deploymentIDs -> {
@@ -118,8 +123,8 @@ when.all(promises).then(
 
 List<Promise<HttpClientResponse>> promises = new ArrayList<>();
 
-promises.add(whenHttpClient.request(HttpMethod.GET, "http://test.englishtown.com/test1", new HttpClientOptions()));
-promises.add(whenHttpClient.request(HttpMethod.POST, "http://test.englishtown.com/test2", new HttpClientOptions()));
+promises.add(whenHttpClient.request(HttpMethod.GET, "http://test.englishtown.com/test1", new RequestOptions()));
+promises.add(whenHttpClient.request(HttpMethod.POST, "http://test.englishtown.com/test2", new RequestOptions()));
 
 when.all(promises).then(
         responses -> {
@@ -138,7 +143,8 @@ when.all(promises).then(
 
 ```java
 
-whenHttpClient.requestResponseBody(HttpMethod.GET, "http://localhost:8081/test", new HttpClientOptions()).then(
+RequestOptions options = new RequestOptions().setPauseResponse(true);
+whenHttpClient.requestResponseBody(HttpMethod.GET, "http://localhost:8081/test", options).then(
     result -> {
         HttpClientResponse response = result.getResponse();
         Buffer body = result.getBody();
