@@ -16,18 +16,25 @@ Add a dependency to vertx-when
 </dependency>
 ```
 
+### Dependency Injection
+
 Use dependency injection to get an instance of:
+
 * `com.englishtown.promises.When`
 * `com.englishtown.vertx.promises.WhenEventBus`
 * `com.englishtown.vertx.promises.WhenHttpClient`
 * `com.englishtown.vertx.promises.WhenVertx`
 
 [HK2](/englishtown/vertx-hk2) and [Guice](/englishtown/vertx-guice) binders are provided
+
 * `com.englishtown.vertx.promises.hk2.HK2WhenBinder`
 * `com.englishtown.vertx.promises.guice.GuiceWhenBinder`
 
 
+### Manual Dependency Creation
+
 If not using DI, you can manually construct the default implementations like this:
+
 ```java
         // Create the vert.x executor for callbacks to run on the vert.x event loop
         VertxExecutor executor = new VertxExecutor(vertx);
@@ -37,10 +44,13 @@ If not using DI, you can manually construct the default implementations like thi
         whenEventBus = new DefaultWhenEventBus(vertx, when);
         whenHttpClient = new DefaultWhenHttpClient(vertx, when);
 ```
+
 (See the `com.englishtown.vertx.promises.integration.simple.NoDIIntegrationTest` integration test for an example.)
 
 
-NOTE: If running vert.x 2.x then you should use module vertx-mod-when 3.0.1.  See earlier README.md files for details.
+### Vert.x 2.x
+
+If running vert.x 2.x, then you should use module vertx-mod-when 3.0.1.  See earlier README.md files for details.
 
 ```xml
 <dependency>
