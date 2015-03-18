@@ -10,14 +10,23 @@
 
     <artifactId>vertx-when-parent</artifactId>
     <packaging>pom</packaging>
-    <version>4.0.0-RC1</version>
+    <version>4.0.0-RC2</version>
 
     <modules>
         <module>vertx-when</module>
+        <module>examples</module>
     </modules>
 
     <description>Provides when.java wrappers for standard vert.x objects to return promises.</description>
     <inceptionYear>2013</inceptionYear>
+
+    <properties>
+        <!--Dependency versions-->
+        <vertx.version>3.0.0-milestone3</vertx.version>
+        <when.java.version>3.1.0</when.java.version>
+        <vertx.hk2.version>2.0.0-RC2</vertx.hk2.version>
+        <vertx.guice.version>2.0.0-RC2</vertx.guice.version>
+    </properties>
 
     <distributionManagement>
         <site>

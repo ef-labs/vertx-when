@@ -28,27 +28,6 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
     }
 
     @Override
-    public Promise<HttpClientResponse> request(HttpMethod method, String absoluteURI) {
-        return request(method, absoluteURI, null);
-    }
-
-    @Override
-    public Promise<HttpClientResponse> request(HttpMethod method, String absoluteURI, RequestOptions options) {
-
-        if (options == null) {
-            options = new RequestOptions();
-        }
-
-        Deferred<HttpClientResponse> d = when.defer();
-
-        HttpClientRequest request = getClient(options)
-                .request(method, absoluteURI, getResponseHandler(options, d))
-                .exceptionHandler(d::reject);
-
-        return doRequest(request, options, d);
-    }
-
-    @Override
     public Promise<HttpClientResponse> request(HttpMethod method, int port, String host, String requestURI) {
         return request(method, port, host, requestURI, null);
     }
@@ -63,8 +42,69 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
         Deferred<HttpClientResponse> d = when.defer();
 
         HttpClientRequest request = getClient(options)
-                .request(method, port, host, requestURI, getResponseHandler(options, d))
-                .exceptionHandler(d::reject);
+                .request(method, port, host, requestURI, getResponseHandler(options, d));
+
+        return doRequest(request, options, d);
+    }
+
+    @Override
+    public Promise<HttpClientResponse> request(HttpMethod method, String host, String requestURI) {
+        return request(method, host, requestURI, null);
+    }
+
+    @Override
+    public Promise<HttpClientResponse> request(HttpMethod method, String host, String requestURI, RequestOptions options) {
+
+        if (options == null) {
+            options = new RequestOptions();
+        }
+
+        Deferred<HttpClientResponse> d = when.defer();
+
+        HttpClientRequest request = getClient(options)
+                .request(method, host, requestURI, getResponseHandler(options, d));
+
+        return doRequest(request, options, d);
+
+    }
+
+    @Override
+    public Promise<HttpClientResponse> request(HttpMethod method, String requestURI) {
+        return request(method, requestURI, (RequestOptions) null);
+    }
+
+    @Override
+    public Promise<HttpClientResponse> request(HttpMethod method, String requestURI, RequestOptions options) {
+
+        if (options == null) {
+            options = new RequestOptions();
+        }
+
+        Deferred<HttpClientResponse> d = when.defer();
+
+        HttpClientRequest request = getClient(options)
+                .request(method, requestURI, getResponseHandler(options, d));
+
+        return doRequest(request, options, d);
+
+    }
+
+    @Override
+    public Promise<HttpClientResponse> requestAbs(HttpMethod method, String absoluteURI) {
+        return requestAbs(method, absoluteURI, null);
+    }
+
+    @Override
+    public Promise<HttpClientResponse> requestAbs(HttpMethod method, String absoluteURI, RequestOptions options) {
+
+        if (options == null) {
+            options = new RequestOptions();
+        }
+
+        Deferred<HttpClientResponse> d = when.defer();
+
+        HttpClientRequest request = getClient(options)
+                .requestAbs(method, absoluteURI, getResponseHandler(options, d));
 
         return doRequest(request, options, d);
     }
@@ -75,8 +115,9 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
         }
         if (options.getClientOptions() != null) {
             return vertx.createHttpClient(options.getClientOptions());
+        } else {
+            return vertx.createHttpClient();
         }
-        return vertx.createHttpClient(new HttpClientOptions());
     }
 
     private Handler<HttpClientResponse> getResponseHandler(RequestOptions options, Resolver<HttpClientResponse> resolver) {
@@ -89,6 +130,8 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
     }
 
     private Promise<HttpClientResponse> doRequest(HttpClientRequest request, RequestOptions options, Deferred<HttpClientResponse> d) {
+
+        request.exceptionHandler(d::reject);
 
         if (options.getChunked()) {
             request.setChunked(true);

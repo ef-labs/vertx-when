@@ -137,25 +137,25 @@ public class DefaultWhenVertxTest {
     }
 
     @Test
-    public void testUndeployVerticle() throws Exception {
+    public void testUndeploy() throws Exception {
         String deploymentID = "id";
         Done<Void> done = new Done<>();
         when(voidResult.succeeded()).thenReturn(true);
 
-        whenContainer.undeployVerticle(deploymentID).then(done.onFulfilled, done.onRejected);
-        verify(vertx).undeployVerticle(eq(deploymentID), voidHandlerCaptor.capture());
+        whenContainer.undeploy(deploymentID).then(done.onFulfilled, done.onRejected);
+        verify(vertx).undeploy(eq(deploymentID), voidHandlerCaptor.capture());
 
         voidHandlerCaptor.getValue().handle(voidResult);
         done.assertFulfilled();
     }
 
     @Test
-    public void testUndeployVerticle_Fail() throws Exception {
+    public void testUndeploy_Fail() throws Exception {
         String deploymentID = "id";
         Done<Void> done = new Done<>();
 
-        whenContainer.undeployVerticle(deploymentID).then(done.onFulfilled, done.onRejected);
-        verify(vertx).undeployVerticle(eq(deploymentID), voidHandlerCaptor.capture());
+        whenContainer.undeploy(deploymentID).then(done.onFulfilled, done.onRejected);
+        verify(vertx).undeploy(eq(deploymentID), voidHandlerCaptor.capture());
 
         voidHandlerCaptor.getValue().handle(voidResult);
         done.assertRejected();

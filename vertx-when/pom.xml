@@ -5,17 +5,10 @@
     <parent>
         <artifactId>vertx-when-parent</artifactId>
         <groupId>com.englishtown.vertx</groupId>
-        <version>4.0.0-RC1</version>
+        <version>4.0.0-RC2</version>
     </parent>
 
     <artifactId>vertx-when</artifactId>
-
-    <properties>
-        <!--Dependency versions-->
-        <when.java.version>3.0.1</when.java.version>
-        <vertx.hk2.version>2.0.0-RC1</vertx.hk2.version>
-        <vertx.guice.version>2.0.0-RC1</vertx.guice.version>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -23,17 +16,19 @@
             <artifactId>when.java</artifactId>
             <version>${when.java.version}</version>
         </dependency>
+
+        <!--Optional dependencies-->
         <dependency>
             <groupId>com.englishtown.vertx</groupId>
             <artifactId>vertx-hk2</artifactId>
             <version>${vertx.hk2.version}</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.englishtown.vertx</groupId>
             <artifactId>vertx-guice</artifactId>
             <version>${vertx.guice.version}</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!--Test dependencies-->
@@ -44,9 +39,9 @@
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>when.java-testtools</artifactId>
+            <artifactId>when.java</artifactId>
             <version>${when.java.version}</version>
-            <scope>test</scope>
+            <type>test-jar</type>
         </dependency>
     </dependencies>
 

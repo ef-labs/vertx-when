@@ -2,25 +2,25 @@ package com.englishtown.vertx.promises.integration;
 
 import com.englishtown.promises.Promise;
 import com.englishtown.promises.When;
-import com.englishtown.vertx.promises.RequestOptions;
-import com.englishtown.vertx.promises.impl.DefaultWhenEventBus;
-import com.englishtown.vertx.promises.impl.DefaultWhenHttpClient;
-import com.englishtown.vertx.promises.impl.DefaultWhenVertx;
+import com.englishtown.vertx.promises.*;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.test.core.VertxTestBase;
 import org.junit.Test;
 
+import java.util.UUID;
+
 /**
  * Integration tests
  */
-@SuppressWarnings("ALL")
 public abstract class IntegrationTestBase extends VertxTestBase {
 
     protected When when;
-    protected DefaultWhenVertx whenVertx;
-    protected DefaultWhenEventBus whenEventBus;
-    protected DefaultWhenHttpClient whenHttpClient;
+    protected WhenVertx whenVertx;
+    protected WhenEventBus whenEventBus;
+    protected WhenHttpClient whenHttpClient;
+    protected WhenFileSystem whenFileSystem;
 
     protected Promise<Void> onRejected(Throwable t) {
         t.printStackTrace();
@@ -73,7 +73,7 @@ public abstract class IntegrationTestBase extends VertxTestBase {
                             .addHeader("X-TEST-1", "1")
                             .addHeader("X-TEST-2", "2");
 
-                    return whenHttpClient.request(HttpMethod.GET, "http://localhost:8081/test", options);
+                    return whenHttpClient.requestAbs(HttpMethod.GET, "http://localhost:8081/test", options);
                 })
                 .then(response -> {
                     assertEquals(200, response.statusCode());
@@ -91,7 +91,7 @@ public abstract class IntegrationTestBase extends VertxTestBase {
         whenVertx.deployVerticle(HttpServerVerticle.class.getName())
                 .then(deploymentID -> {
                     RequestOptions options = new RequestOptions().setPauseResponse(true);
-                    return whenHttpClient.request(HttpMethod.GET, "http://localhost:8081/test", options);
+                    return whenHttpClient.requestAbs(HttpMethod.GET, "http://localhost:8081/test", options);
                 })
                 .then(response -> {
                     assertNotNull(response);
@@ -103,6 +103,44 @@ public abstract class IntegrationTestBase extends VertxTestBase {
                     JsonObject json = new JsonObject(body.toString());
                     assertNotNull(json);
 
+                    testComplete();
+                    return null;
+                })
+                .otherwise(this::onRejected);
+
+        await();
+    }
+
+    @Test
+    public void testFileSystem() throws Exception {
+
+        String path = UUID.randomUUID().toString();
+        String text = "Hello world!";
+
+        whenFileSystem.exists(path)
+                .then(exists -> {
+                    assertFalse(exists);
+                    return whenFileSystem.createFile(path);
+                })
+                .then(aVoid -> whenFileSystem.exists(path))
+                .then(exists -> {
+                    assertTrue(exists);
+                    return whenFileSystem.readDir(".");
+                })
+                .then(contents -> {
+                    assertTrue(contents.size() > 0);
+                    return whenFileSystem.props(path);
+                })
+                .then(props -> {
+                    assertTrue(props.isRegularFile());
+                    return whenFileSystem.writeFile(path, Buffer.buffer(text));
+                })
+                .then(aVoid -> whenFileSystem.readFile(path))
+                .then(buffer -> {
+                    assertEquals(text, buffer.toString());
+                    return whenFileSystem.delete(path);
+                })
+                .then(aVoid -> {
                     testComplete();
                     return null;
                 })

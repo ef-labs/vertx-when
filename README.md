@@ -1,8 +1,64 @@
 [![Build Status](https://travis-ci.org/englishtown/vertx-when.png)](https://travis-ci.org/englishtown/vertx-when)
 
-# ext-when
+# vertx-when
 
-Provides when.java wrappers for standard vert.x objects to return promises.
+Provides when.java wrappers for standard vert.x 3 objects to return promises.
+
+## Getting Started
+
+Add a dependency to vertx-when
+
+```xml
+<dependency>
+    <groupId>com.englishtown.vertx</groupId>
+    <artifactId>vertx-when</artifactId>
+    <version>4.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+### Dependency Injection
+
+Use dependency injection to get an instance of:
+
+* `com.englishtown.promises.When`
+* `com.englishtown.vertx.promises.WhenEventBus`
+* `com.englishtown.vertx.promises.WhenHttpClient`
+* `com.englishtown.vertx.promises.WhenVertx`
+
+[HK2](/englishtown/vertx-hk2) and [Guice](/englishtown/vertx-guice) binders are provided
+
+* `com.englishtown.vertx.promises.hk2.HK2WhenBinder`
+* `com.englishtown.vertx.promises.guice.GuiceWhenBinder`
+
+
+### Manual Dependency Creation
+
+If not using DI, you can manually construct the default implementations like this:
+
+```java
+        // Create the vert.x executor for callbacks to run on the vert.x event loop
+        VertxExecutor executor = new VertxExecutor(vertx);
+        when = WhenFactory.createFor(() -> executor);
+
+        whenVertx = new DefaultWhenVertx(vertx, when);
+        whenEventBus = new DefaultWhenEventBus(vertx, when);
+        whenHttpClient = new DefaultWhenHttpClient(vertx, when);
+```
+
+(See the `com.englishtown.vertx.promises.integration.simple.NoDIIntegrationTest` integration test for an example.)
+
+
+### Vert.x 2.x
+
+If running vert.x 2.x, then you should use module vertx-mod-when 3.0.1.  See earlier README.md files for details.
+
+```xml
+<dependency>
+    <groupId>com.englishtown</groupId>
+    <artifactId>vertx-mod-when</artifactId>
+    <version>3.0.1</version>
+</dependency>
+```
 
 
 ## WhenVertx Examples
@@ -11,7 +67,7 @@ Provides when.java wrappers for standard vert.x objects to return promises.
 
 ```java
 
-whenContainer.deployVerticle("com.englishtown.vertx.TestVerticle")
+whenVertx.deployVerticle("com.englishtown.vertx.TestVerticle")
     .then(deploymentID -> {
         // On success
         return null;
@@ -29,8 +85,8 @@ whenContainer.deployVerticle("com.englishtown.vertx.TestVerticle")
 
 List<Promise<String>> promises = new ArrayList<>();
 
-promises.add(whenContainer.deployVerticle("com.englishtown.vertx.TestVerticle1"));
-promises.add(whenContainer.deployVerticle("com.englishtown.vertx.TestVerticle2"));
+promises.add(vertxWhen.deployVerticle("com.englishtown.vertx.TestVerticle1"));
+promises.add(vertxWhen.deployVerticle("com.englishtown.vertx.TestVerticle2"));
 
 when.all(promises)
     .then(deploymentIDs -> {
@@ -77,8 +133,8 @@ when.all(promises).then(
 
 List<Promise<HttpClientResponse>> promises = new ArrayList<>();
 
-promises.add(whenHttpClient.request(HttpMethod.GET, "http://test.englishtown.com/test1", new HttpClientOptions()));
-promises.add(whenHttpClient.request(HttpMethod.POST, "http://test.englishtown.com/test2", new HttpClientOptions()));
+promises.add(whenHttpClient.request(HttpMethod.GET, "http://test.englishtown.com/test1", new RequestOptions()));
+promises.add(whenHttpClient.request(HttpMethod.POST, "http://test.englishtown.com/test2", new RequestOptions()));
 
 when.all(promises).then(
         responses -> {
@@ -97,7 +153,8 @@ when.all(promises).then(
 
 ```java
 
-whenHttpClient.requestResponseBody(HttpMethod.GET, "http://localhost:8081/test", new HttpClientOptions()).then(
+RequestOptions options = new RequestOptions().setPauseResponse(true);
+whenHttpClient.requestResponseBody(HttpMethod.GET, "http://localhost:8081/test", options).then(
     result -> {
         HttpClientResponse response = result.getResponse();
         Buffer body = result.getBody();

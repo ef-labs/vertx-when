@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -62,10 +63,15 @@ public class DefaultWhenHttpClientTest {
 
     @Before
     public void setUp() throws Exception {
+
         When when = WhenFactory.createSync();
+
+        when(vertx.createHttpClient()).thenReturn(client);
         when(vertx.createHttpClient(any())).thenReturn(client);
-        when(client.request(any(), anyInt(), anyString(), anyString(), any())).thenReturn(request);
-        when(client.request(any(), anyString(), any())).thenReturn(request);
+        when(client.request(any(), anyInt(), anyString(), anyString(), Matchers.<Handler<HttpClientResponse>>any())).thenReturn(request);
+        when(client.request(any(), anyString(), anyString(), Matchers.<Handler<HttpClientResponse>>any())).thenReturn(request);
+        when(client.request(any(), anyString(), Matchers.<Handler<HttpClientResponse>>any())).thenReturn(request);
+        when(client.requestAbs(any(), anyString(), Matchers.<Handler<HttpClientResponse>>any())).thenReturn(request);
         when(request.exceptionHandler(any())).thenReturn(request);
         when(request.headers()).thenReturn(headers);
         whenHttpClient = new DefaultWhenHttpClient(vertx, when);
@@ -74,15 +80,6 @@ public class DefaultWhenHttpClientTest {
     @Test
     public void testRequest1() throws Exception {
 
-        whenHttpClient.request(HttpMethod.GET, absoluteURI);
-        verify(client).request(eq(HttpMethod.GET), eq(absoluteURI), any());
-        verify(request).end();
-
-    }
-
-    @Test
-    public void testRequest2() throws Exception {
-
         whenHttpClient.request(HttpMethod.POST, port, host, requestURI);
         verify(client).request(eq(HttpMethod.POST), eq(port), eq(host), eq(requestURI), any());
         verify(request).end();
@@ -90,61 +87,88 @@ public class DefaultWhenHttpClientTest {
     }
 
     @Test
-    public void testRequest_Client() throws Exception {
+    public void testRequest2() throws Exception {
 
-        HttpClient otherClient = mock(HttpClient.class);
-        when(otherClient.request(any(), anyString(), any())).thenReturn(request);
-        RequestOptions options = new RequestOptions().setClient(otherClient);
-
-        whenHttpClient.request(HttpMethod.GET, absoluteURI, options);
-        verify(otherClient).request(any(), anyString(), any());
+        whenHttpClient.request(HttpMethod.POST, host, requestURI);
+        verify(client).request(eq(HttpMethod.POST), eq(host), eq(requestURI), any());
         verify(request).end();
 
     }
 
     @Test
-    public void testRequest_ClientOptions() throws Exception {
+    public void testRequest3() throws Exception {
+
+        whenHttpClient.request(HttpMethod.POST, requestURI);
+        verify(client).request(eq(HttpMethod.POST), eq(requestURI), Matchers.<Handler<HttpClientResponse>>any());
+        verify(request).end();
+
+    }
+
+    @Test
+    public void testRequestAbs() throws Exception {
+
+        whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI);
+        verify(client).requestAbs(eq(HttpMethod.GET), eq(absoluteURI), any());
+        verify(request).end();
+
+    }
+
+    @Test
+    public void testRequestAbs_Client() throws Exception {
+
+        HttpClient otherClient = mock(HttpClient.class);
+        when(otherClient.requestAbs(any(), anyString(), any())).thenReturn(request);
+        RequestOptions options = new RequestOptions().setClient(otherClient);
+
+        whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI, options);
+        verify(otherClient).requestAbs(any(), anyString(), any());
+        verify(request).end();
+
+    }
+
+    @Test
+    public void testRequestAbs_ClientOptions() throws Exception {
 
         HttpClientOptions clientOptions = mock(HttpClientOptions.class);
         RequestOptions options = new RequestOptions().setClientOptions(clientOptions);
 
-        whenHttpClient.request(HttpMethod.GET, absoluteURI, options);
+        whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI, options);
         verify(vertx).createHttpClient(eq(clientOptions));
         verify(request).end();
 
     }
 
     @Test
-    public void testRequest_Data1() throws Exception {
+    public void testRequestAbs_Data() throws Exception {
 
         Buffer buffer = mock(Buffer.class);
         RequestOptions options = new RequestOptions().setData(buffer);
 
-        whenHttpClient.request(HttpMethod.GET, absoluteURI, options);
+        whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI, options);
         verify(request).end(eq(buffer));
 
     }
 
     @Test
-    public void testRequest_Data2() throws Exception {
+    public void testRequestAbs_Data2() throws Exception {
 
         String data = "hello";
         RequestOptions options = new RequestOptions().setData(data);
 
-        whenHttpClient.request(HttpMethod.GET, absoluteURI, options);
+        whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI, options);
         verify(request).end(bufferCaptor.capture());
         assertEquals("hello", bufferCaptor.getValue().toString());
 
     }
 
     @Test
-    public void testRequest_Header() throws Exception {
+    public void testRequestAbs_Header() throws Exception {
 
         String name = "X-Test-1";
         String value = "1";
         RequestOptions options = new RequestOptions().addHeader(name, value);
 
-        whenHttpClient.request(HttpMethod.GET, absoluteURI, options);
+        whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI, options);
         verify(headers).addAll(headersCaptor.capture());
         assertEquals(value, headersCaptor.getValue().get(name));
         verify(request).end();
@@ -152,57 +176,57 @@ public class DefaultWhenHttpClientTest {
     }
 
     @Test
-    public void testRequest_Headers() throws Exception {
+    public void testRequestAbs_Headers() throws Exception {
 
         Map<String, String> headers2 = new HashMap<>();
         RequestOptions options = new RequestOptions().setHeaders(headers2);
 
-        whenHttpClient.request(HttpMethod.GET, absoluteURI, options);
+        whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI, options);
         verify(headers).addAll(eq(headers2));
         verify(request).end();
 
     }
 
     @Test
-    public void testRequest_Chunked() throws Exception {
+    public void testRequestAbs_Chunked() throws Exception {
 
         RequestOptions options = new RequestOptions().setChunked(true);
 
-        whenHttpClient.request(HttpMethod.GET, absoluteURI, options);
+        whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI, options);
         verify(request).setChunked(eq(true));
         verify(request).end();
 
     }
 
     @Test
-    public void testRequest_Timeout() throws Exception {
+    public void testRequestAbs_Timeout() throws Exception {
 
         RequestOptions options = new RequestOptions().setTimeout(100);
 
-        whenHttpClient.request(HttpMethod.GET, absoluteURI, options);
+        whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI, options);
         verify(request).setTimeout(eq(100L));
         verify(request).end();
 
     }
 
     @Test
-    public void testRequest_WriteQueueMaxSize() throws Exception {
+    public void testRequestAbs_WriteQueueMaxSize() throws Exception {
 
         RequestOptions options = new RequestOptions().setWriteQueueMaxSize(100);
 
-        whenHttpClient.request(HttpMethod.GET, absoluteURI, options);
+        whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI, options);
         verify(request).setWriteQueueMaxSize(eq(100));
         verify(request).end();
 
     }
 
     @Test
-    public void testRequest_PauseResponse() throws Exception {
+    public void testRequestAbs_PauseResponse() throws Exception {
 
         RequestOptions options = new RequestOptions().setPauseResponse(true);
 
-        whenHttpClient.request(HttpMethod.GET, absoluteURI, options);
-        verify(client).request(any(), any(), responseHandlerCaptor.capture());
+        whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI, options);
+        verify(client).requestAbs(any(), any(), responseHandlerCaptor.capture());
         verify(request).end();
 
         responseHandlerCaptor.getValue().handle(response);
@@ -212,12 +236,12 @@ public class DefaultWhenHttpClientTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testRequest_Setup() throws Exception {
+    public void testRequestAbs_Setup() throws Exception {
 
         Function<HttpClientRequest, Promise<Void>> setup = mock(Function.class);
         RequestOptions options = new RequestOptions().setSetupHandler(setup);
 
-        whenHttpClient.request(HttpMethod.GET, absoluteURI, options);
+        whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI, options);
 
         verify(setup).apply(eq(request));
         verify(request).end();
