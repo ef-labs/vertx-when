@@ -3,6 +3,7 @@ package com.englishtown.vertx.promises.integration.hk2;
 import com.englishtown.promises.When;
 import com.englishtown.vertx.hk2.HK2VertxBinder;
 import com.englishtown.vertx.promises.WhenEventBus;
+import com.englishtown.vertx.promises.WhenFileSystem;
 import com.englishtown.vertx.promises.WhenHttpClient;
 import com.englishtown.vertx.promises.WhenVertx;
 import com.englishtown.vertx.promises.hk2.HK2WhenBinder;
@@ -29,6 +30,7 @@ public class HK2IntegrationTest extends IntegrationTestBase {
         whenVertx = locator.getService(WhenVertx.class);
         whenEventBus = locator.getService(WhenEventBus.class);
         whenHttpClient = locator.getService(WhenHttpClient.class);
+        whenFileSystem = locator.getService(WhenFileSystem.class);
 
     }
 

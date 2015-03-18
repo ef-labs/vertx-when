@@ -70,14 +70,14 @@ public class DefaultWhenVertx implements WhenVertx {
     /**
      * Deploy a verticle programmatically
      *
-     * @param identifier The verticle identifier
+     * @param name The verticle identifier
      * @return A promise for the deployment id
      */
     @Override
-    public Promise<String> deployVerticle(String identifier) {
+    public Promise<String> deployVerticle(String name) {
         Deferred<String> d = when.defer();
 
-        vertx.deployVerticle(identifier, result -> {
+        vertx.deployVerticle(name, result -> {
             if (result.succeeded()) {
                 d.resolve(result.result());
             } else {
@@ -91,15 +91,15 @@ public class DefaultWhenVertx implements WhenVertx {
     /**
      * Deploy a verticle programmatically
      *
-     * @param identifier The verticle identifier
+     * @param name The verticle identifier
      * @param options  The deployment options
      * @return A promise for the deployment id
      */
     @Override
-    public Promise<String> deployVerticle(String identifier, DeploymentOptions options) {
+    public Promise<String> deployVerticle(String name, DeploymentOptions options) {
         Deferred<String> d = when.defer();
 
-        vertx.deployVerticle(identifier, options, result -> {
+        vertx.deployVerticle(name, options, result -> {
             if (result.succeeded()) {
                 d.resolve(result.result());
             } else {
@@ -117,10 +117,10 @@ public class DefaultWhenVertx implements WhenVertx {
      * @return A promise for undeployment completion
      */
     @Override
-    public Promise<Void> undeployVerticle(String deploymentID) {
+    public Promise<Void> undeploy(String deploymentID) {
         Deferred<Void> d = when.defer();
 
-        vertx.undeployVerticle(deploymentID, result -> {
+        vertx.undeploy(deploymentID, result -> {
             if (result.succeeded()) {
                 d.resolve(result.result());
             } else {

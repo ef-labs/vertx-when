@@ -3,6 +3,7 @@ package com.englishtown.vertx.promises.integration.guice;
 import com.englishtown.promises.When;
 import com.englishtown.vertx.guice.GuiceVertxBinder;
 import com.englishtown.vertx.promises.WhenEventBus;
+import com.englishtown.vertx.promises.WhenFileSystem;
 import com.englishtown.vertx.promises.WhenHttpClient;
 import com.englishtown.vertx.promises.WhenVertx;
 import com.englishtown.vertx.promises.guice.GuiceWhenBinder;
@@ -27,6 +28,8 @@ public class GuiceIntegrationTest extends IntegrationTestBase {
         whenVertx = injector.getInstance(WhenVertx.class);
         whenEventBus = injector.getInstance(WhenEventBus.class);
         whenHttpClient = injector.getInstance(WhenHttpClient.class);
+        whenFileSystem = injector.getInstance(WhenFileSystem.class);
+
     }
 
 }

@@ -1,5 +1,6 @@
 package com.englishtown.vertx.promises.hk2;
 
+import com.englishtown.vertx.promises.WhenFileSystem;
 import com.englishtown.vertx.promises.WhenVertx;
 import com.englishtown.vertx.promises.WhenEventBus;
 import com.englishtown.vertx.promises.WhenHttpClient;
@@ -27,6 +28,7 @@ public class HK2WhenBinder extends AbstractBinder {
         bind(DefaultWhenVertx.class).to(WhenVertx.class).in(Singleton.class);
         bind(DefaultWhenEventBus.class).to(WhenEventBus.class).in(Singleton.class);
         bind(DefaultWhenHttpClient.class).to(WhenHttpClient.class).in(Singleton.class);
+        bind(DefaultWhenFileSystem.class).to(WhenFileSystem.class).in(Singleton.class);
 
     }
 }

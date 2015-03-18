@@ -1,10 +1,7 @@
 package com.englishtown.vertx.promises.integration.simple;
 
 import com.englishtown.promises.WhenFactory;
-import com.englishtown.vertx.promises.impl.DefaultWhenEventBus;
-import com.englishtown.vertx.promises.impl.DefaultWhenHttpClient;
-import com.englishtown.vertx.promises.impl.DefaultWhenVertx;
-import com.englishtown.vertx.promises.impl.VertxExecutor;
+import com.englishtown.vertx.promises.impl.*;
 import com.englishtown.vertx.promises.integration.IntegrationTestBase;
 
 /**
@@ -23,6 +20,7 @@ public class NoDIIntegrationTest extends IntegrationTestBase {
         whenVertx = new DefaultWhenVertx(vertx, when);
         whenEventBus = new DefaultWhenEventBus(vertx, when);
         whenHttpClient = new DefaultWhenHttpClient(vertx, when);
+        whenFileSystem = new DefaultWhenFileSystem(vertx, when);
 
     }
 }

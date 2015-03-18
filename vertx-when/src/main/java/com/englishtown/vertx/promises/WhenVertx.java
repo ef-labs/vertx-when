@@ -29,20 +29,19 @@ public interface WhenVertx {
     /**
      * Deploy a verticle programmatically
      *
-     * @param identifier The verticle identifier
+     * @param name The verticle identifier
      * @return A promise for the deployment id
      */
-    Promise<String> deployVerticle(String identifier);
+    Promise<String> deployVerticle(String name);
 
     /**
      * Deploy a verticle programmatically
      *
-     * @param identifier The verticle identifier
+     * @param name The verticle identifier
      * @param options    The deployment options
      * @return A promise for the deployment id
      */
-    Promise<String> deployVerticle(String identifier, DeploymentOptions options);
-
+    Promise<String> deployVerticle(String name, DeploymentOptions options);
 
     /**
      * Undeploy a verticle
@@ -50,6 +49,6 @@ public interface WhenVertx {
      * @param deploymentID The deployment ID
      * @return A promise for undeployment completion
      */
-    Promise<Void> undeployVerticle(String deploymentID);
+    Promise<Void> undeploy(String deploymentID);
 
 }
