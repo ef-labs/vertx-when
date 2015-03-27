@@ -2,7 +2,7 @@
 
 # vertx-when
 
-Provides when.java wrappers for standard vert.x 3 objects to return promises.
+Provides [when.java](https://github.com/englishtown/when.java) wrappers for standard vert.x 3 objects to return promises.
 
 ## Getting Started
 
