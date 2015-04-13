@@ -1,9 +1,6 @@
 package com.englishtown.vertx.promises.hk2;
 
-import com.englishtown.vertx.promises.WhenFileSystem;
-import com.englishtown.vertx.promises.WhenVertx;
-import com.englishtown.vertx.promises.WhenEventBus;
-import com.englishtown.vertx.promises.WhenHttpClient;
+import com.englishtown.vertx.promises.*;
 import com.englishtown.vertx.promises.impl.*;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
@@ -29,6 +26,7 @@ public class HK2WhenBinder extends AbstractBinder {
         bind(DefaultWhenEventBus.class).to(WhenEventBus.class).in(Singleton.class);
         bind(DefaultWhenHttpClient.class).to(WhenHttpClient.class).in(Singleton.class);
         bind(DefaultWhenFileSystem.class).to(WhenFileSystem.class).in(Singleton.class);
+        bind(DefaultPromiseAdapter.class).to(PromiseAdapter.class).in(Singleton.class);
 
     }
 }

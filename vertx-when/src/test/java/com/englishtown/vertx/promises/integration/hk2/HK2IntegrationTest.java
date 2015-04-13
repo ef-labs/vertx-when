@@ -7,8 +7,6 @@ import com.englishtown.vertx.promises.WhenFileSystem;
 import com.englishtown.vertx.promises.WhenHttpClient;
 import com.englishtown.vertx.promises.WhenVertx;
 import com.englishtown.vertx.promises.hk2.HK2WhenBinder;
-import com.englishtown.vertx.promises.impl.DefaultWhenEventBus;
-import com.englishtown.vertx.promises.impl.DefaultWhenHttpClient;
 import com.englishtown.vertx.promises.integration.IntegrationTestBase;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.ServiceLocatorFactory;

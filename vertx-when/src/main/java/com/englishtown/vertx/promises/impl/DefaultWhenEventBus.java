@@ -1,8 +1,8 @@
 package com.englishtown.vertx.promises.impl;
 
-import com.englishtown.promises.Deferred;
 import com.englishtown.promises.Promise;
 import com.englishtown.promises.When;
+import com.englishtown.vertx.promises.PromiseAdapter;
 import com.englishtown.vertx.promises.WhenEventBus;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
@@ -17,7 +17,7 @@ import javax.inject.Inject;
 public class DefaultWhenEventBus implements WhenEventBus {
 
     private final EventBus eventBus;
-    private final When when;
+    private final PromiseAdapter adapter;
 
     /**
      * Takes the event bus off the provided vert.x instance
@@ -25,6 +25,15 @@ public class DefaultWhenEventBus implements WhenEventBus {
      * @param vertx the vertx instance with the event bus to wrap
      */
     @Inject
+    public DefaultWhenEventBus(Vertx vertx, PromiseAdapter adapter) {
+        this(vertx.eventBus(), adapter);
+    }
+
+    /**
+     * Takes the event bus off the provided vert.x instance
+     *
+     * @param vertx the vertx instance with the event bus to wrap
+     */
     public DefaultWhenEventBus(Vertx vertx, When when) {
         this(vertx.eventBus(), when);
     }
@@ -34,9 +43,18 @@ public class DefaultWhenEventBus implements WhenEventBus {
      *
      * @param eventBus the event bus instance to wrap
      */
-    public DefaultWhenEventBus(EventBus eventBus, When when) {
+    public DefaultWhenEventBus(EventBus eventBus, PromiseAdapter adapter) {
         this.eventBus = eventBus;
-        this.when = when;
+        this.adapter = adapter;
+    }
+
+    /**
+     * Directly provide the event bus instance to use
+     *
+     * @param eventBus the event bus instance to wrap
+     */
+    public DefaultWhenEventBus(EventBus eventBus, When when) {
+        this(eventBus, new DefaultPromiseAdapter(when));
     }
 
     /**
@@ -56,17 +74,7 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public Promise<Void> close() {
-        Deferred<Void> d = when.defer();
-
-        eventBus.close(result -> {
-            if (result.succeeded()) {
-                d.resolve((Void) null);
-            } else {
-                d.reject(result.cause());
-            }
-        });
-
-        return d.getPromise();
+        return adapter.toPromise(eventBus::close);
     }
 
     /**
@@ -78,17 +86,7 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> send(String address, Object message) {
-        Deferred<Message<T>> d = when.defer();
-
-        eventBus.<T>send(address, message, result -> {
-            if (result.succeeded()) {
-                d.resolve(result.result());
-            } else {
-                d.reject(result.cause());
-            }
-        });
-
-        return d.getPromise();
+        return adapter.toPromise(handler -> eventBus.send(address, message, handler));
     }
 
     /**
@@ -101,17 +99,7 @@ public class DefaultWhenEventBus implements WhenEventBus {
      */
     @Override
     public <T> Promise<Message<T>> send(String address, Object message, DeliveryOptions options) {
-        Deferred<Message<T>> d = when.defer();
-
-        eventBus.<T>send(address, message, options, result -> {
-            if (result.succeeded()) {
-                d.resolve(result.result());
-            } else {
-                d.reject(result.cause());
-            }
-        });
-
-        return d.getPromise();
+        return adapter.toPromise(handler -> eventBus.send(address, message, options, handler));
     }
 
 }

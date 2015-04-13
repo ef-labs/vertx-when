@@ -9,6 +9,7 @@ import com.englishtown.vertx.promises.impl.DefaultWhenEventBus
 import com.englishtown.vertx.promises.impl.DefaultWhenHttpClient
 import com.englishtown.vertx.promises.impl.DefaultWhenVertx
 import com.englishtown.vertx.promises.impl.VertxExecutor
+import io.vertx.core.Vertx
 import io.vertx.lang.groovy.GroovyVerticle
 
 /**
@@ -37,7 +38,7 @@ public class WhenExampleVerticle extends GroovyVerticle {
     private void initWhen() {
 
         // Get a reference the the java io.vertx.core.Vertx instance
-        io.vertx.core.Vertx jVertx = vertx.getDelegate() as io.vertx.core.Vertx;
+        Vertx jVertx = vertx.getDelegate() as Vertx;
 
         // Use the vert.x executor to queue callbacks on the vert.x event loop
         when = WhenFactory.createFor({ new VertxExecutor(jVertx) })
