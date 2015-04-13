@@ -1,8 +1,8 @@
 package com.englishtown.vertx.promises.impl;
 
-import com.englishtown.promises.Deferred;
 import com.englishtown.promises.Promise;
 import com.englishtown.promises.When;
+import com.englishtown.vertx.promises.PromiseAdapter;
 import com.englishtown.vertx.promises.WhenVertx;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Verticle;
@@ -16,12 +16,16 @@ import javax.inject.Inject;
 public class DefaultWhenVertx implements WhenVertx {
 
     private final Vertx vertx;
-    private final When when;
+    private final PromiseAdapter adapter;
 
     @Inject
-    public DefaultWhenVertx(Vertx vertx, When when) {
+    public DefaultWhenVertx(Vertx vertx, PromiseAdapter adapter) {
         this.vertx = vertx;
-        this.when = when;
+        this.adapter = adapter;
+    }
+
+    public DefaultWhenVertx(Vertx vertx, When when) {
+        this(vertx, new DefaultPromiseAdapter(when));
     }
 
     /**
@@ -32,17 +36,7 @@ public class DefaultWhenVertx implements WhenVertx {
      */
     @Override
     public Promise<String> deployVerticle(Verticle verticle) {
-        Deferred<String> d = when.defer();
-
-        vertx.deployVerticle(verticle, result -> {
-            if (result.succeeded()) {
-                d.resolve(result.result());
-            } else {
-                d.reject(result.cause());
-            }
-        });
-
-        return d.getPromise();
+        return adapter.toPromise(handler -> vertx.deployVerticle(verticle, handler));
     }
 
     /**
@@ -54,17 +48,7 @@ public class DefaultWhenVertx implements WhenVertx {
      */
     @Override
     public Promise<String> deployVerticle(Verticle verticle, DeploymentOptions options) {
-        Deferred<String> d = when.defer();
-
-        vertx.deployVerticle(verticle, options, result -> {
-            if (result.succeeded()) {
-                d.resolve(result.result());
-            } else {
-                d.reject(result.cause());
-            }
-        });
-
-        return d.getPromise();
+        return adapter.toPromise(handler -> vertx.deployVerticle(verticle, options, handler));
     }
 
     /**
@@ -75,39 +59,19 @@ public class DefaultWhenVertx implements WhenVertx {
      */
     @Override
     public Promise<String> deployVerticle(String name) {
-        Deferred<String> d = when.defer();
-
-        vertx.deployVerticle(name, result -> {
-            if (result.succeeded()) {
-                d.resolve(result.result());
-            } else {
-                d.reject(result.cause());
-            }
-        });
-
-        return d.getPromise();
+        return adapter.toPromise(handler -> vertx.deployVerticle(name, handler));
     }
 
     /**
      * Deploy a verticle programmatically
      *
-     * @param name The verticle identifier
-     * @param options  The deployment options
+     * @param name    The verticle identifier
+     * @param options The deployment options
      * @return A promise for the deployment id
      */
     @Override
     public Promise<String> deployVerticle(String name, DeploymentOptions options) {
-        Deferred<String> d = when.defer();
-
-        vertx.deployVerticle(name, options, result -> {
-            if (result.succeeded()) {
-                d.resolve(result.result());
-            } else {
-                d.reject(result.cause());
-            }
-        });
-
-        return d.getPromise();
+        return adapter.toPromise(handler -> vertx.deployVerticle(name, options, handler));
     }
 
     /**
@@ -118,16 +82,7 @@ public class DefaultWhenVertx implements WhenVertx {
      */
     @Override
     public Promise<Void> undeploy(String deploymentID) {
-        Deferred<Void> d = when.defer();
-
-        vertx.undeploy(deploymentID, result -> {
-            if (result.succeeded()) {
-                d.resolve(result.result());
-            } else {
-                d.reject(result.cause());
-            }
-        });
-
-        return d.getPromise();
+        return adapter.toPromise(handler -> vertx.undeploy(deploymentID, handler));
     }
+
 }

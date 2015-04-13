@@ -1,14 +1,8 @@
 package com.englishtown.vertx.promises.guice;
 
 import com.englishtown.promises.guice.WhenBinder;
-import com.englishtown.vertx.promises.WhenEventBus;
-import com.englishtown.vertx.promises.WhenFileSystem;
-import com.englishtown.vertx.promises.WhenHttpClient;
-import com.englishtown.vertx.promises.WhenVertx;
-import com.englishtown.vertx.promises.impl.DefaultWhenEventBus;
-import com.englishtown.vertx.promises.impl.DefaultWhenFileSystem;
-import com.englishtown.vertx.promises.impl.DefaultWhenHttpClient;
-import com.englishtown.vertx.promises.impl.DefaultWhenVertx;
+import com.englishtown.vertx.promises.*;
+import com.englishtown.vertx.promises.impl.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.util.Modules;
 
@@ -30,6 +24,7 @@ public class GuiceWhenBinder extends AbstractModule {
         bind(WhenEventBus.class).to(DefaultWhenEventBus.class).in(Singleton.class);
         bind(WhenHttpClient.class).to(DefaultWhenHttpClient.class).in(Singleton.class);
         bind(WhenFileSystem.class).to(DefaultWhenFileSystem.class).in(Singleton.class);
+        bind(PromiseAdapter.class).to(DefaultPromiseAdapter.class).in(Singleton.class);
 
     }
 }

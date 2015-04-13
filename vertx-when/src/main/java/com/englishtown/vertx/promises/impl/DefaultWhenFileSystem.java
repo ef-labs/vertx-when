@@ -1,11 +1,9 @@
 package com.englishtown.vertx.promises.impl;
 
-import com.englishtown.promises.Deferred;
 import com.englishtown.promises.Promise;
 import com.englishtown.promises.When;
+import com.englishtown.vertx.promises.PromiseAdapter;
 import com.englishtown.vertx.promises.WhenFileSystem;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.AsyncFile;
@@ -15,7 +13,6 @@ import io.vertx.core.file.OpenOptions;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * Default implementation of {@link com.englishtown.vertx.promises.WhenFileSystem}
@@ -23,12 +20,16 @@ import java.util.function.Consumer;
 public class DefaultWhenFileSystem implements WhenFileSystem {
 
     private final Vertx vertx;
-    private final When when;
+    private final PromiseAdapter adapter;
 
     @Inject
-    public DefaultWhenFileSystem(Vertx vertx, When when) {
+    public DefaultWhenFileSystem(Vertx vertx, PromiseAdapter adapter) {
         this.vertx = vertx;
-        this.when = when;
+        this.adapter = adapter;
+    }
+
+    public DefaultWhenFileSystem(Vertx vertx, When when) {
+        this(vertx, new DefaultPromiseAdapter(when));
     }
 
     /**
@@ -42,7 +43,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> copy(String from, String to) {
-        return toPromise(handler -> vertx.fileSystem().copy(from, to, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().copy(from, to, handler));
     }
 
     /**
@@ -60,7 +61,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> copyRecursive(String from, String to, boolean recursive) {
-        return toPromise(handler -> vertx.fileSystem().copyRecursive(from, to, recursive, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().copyRecursive(from, to, recursive, handler));
     }
 
     /**
@@ -74,7 +75,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> move(String from, String to) {
-        return toPromise(handler -> vertx.fileSystem().move(from, to, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().move(from, to, handler));
     }
 
     /**
@@ -88,7 +89,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> truncate(String path, long len) {
-        return toPromise(handler -> vertx.fileSystem().truncate(path, len, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().truncate(path, len, handler));
     }
 
     /**
@@ -103,7 +104,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> chmod(String path, String perms) {
-        return toPromise(handler -> vertx.fileSystem().chmod(path, perms, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().chmod(path, perms, handler));
     }
 
     /**
@@ -121,7 +122,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> chmodRecursive(String path, String perms, String dirPerms) {
-        return toPromise(handler -> vertx.fileSystem().chmodRecursive(path, perms, dirPerms, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().chmodRecursive(path, perms, dirPerms, handler));
     }
 
     /**
@@ -134,7 +135,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> chown(String path, String user, String group) {
-        return toPromise(handler -> vertx.fileSystem().chown(path, user, group, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().chown(path, user, group, handler));
     }
 
     /**
@@ -147,7 +148,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<FileProps> props(String path) {
-        return toPromise(handler -> vertx.fileSystem().props(path, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().props(path, handler));
     }
 
     /**
@@ -160,7 +161,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<FileProps> lprops(String path) {
-        return toPromise(handler -> vertx.fileSystem().lprops(path, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().lprops(path, handler));
     }
 
     /**
@@ -172,7 +173,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> link(String link, String existing) {
-        return toPromise(handler -> vertx.fileSystem().link(link, existing, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().link(link, existing, handler));
     }
 
     /**
@@ -184,7 +185,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> symlink(String link, String existing) {
-        return toPromise(handler -> vertx.fileSystem().symlink(link, existing, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().symlink(link, existing, handler));
     }
 
     /**
@@ -195,7 +196,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> unlink(String link) {
-        return toPromise(handler -> vertx.fileSystem().unlink(link, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().unlink(link, handler));
     }
 
     /**
@@ -206,7 +207,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<String> readSymlink(String link) {
-        return toPromise(handler -> vertx.fileSystem().readSymlink(link, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().readSymlink(link, handler));
     }
 
     /**
@@ -217,7 +218,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> delete(String path) {
-        return toPromise(handler -> vertx.fileSystem().delete(path, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().delete(path, handler));
     }
 
     /**
@@ -232,7 +233,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> deleteRecursive(String path, boolean recursive) {
-        return toPromise(handler -> vertx.fileSystem().deleteRecursive(path, recursive, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().deleteRecursive(path, recursive, handler));
     }
 
     /**
@@ -245,7 +246,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> mkdir(String path) {
-        return toPromise(handler -> vertx.fileSystem().mkdir(path, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().mkdir(path, handler));
     }
 
     /**
@@ -264,7 +265,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> mkdir(String path, String perms) {
-        return toPromise(handler -> vertx.fileSystem().mkdir(path, perms, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().mkdir(path, perms, handler));
     }
 
     /**
@@ -277,7 +278,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> mkdirs(String path) {
-        return toPromise(handler -> vertx.fileSystem().mkdirs(path, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().mkdirs(path, handler));
     }
 
     /**
@@ -296,7 +297,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> mkdirs(String path, String perms) {
-        return toPromise(handler -> vertx.fileSystem().mkdirs(path, perms, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().mkdirs(path, perms, handler));
     }
 
     /**
@@ -309,7 +310,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<List<String>> readDir(String path) {
-        return toPromise(handler -> vertx.fileSystem().readDir(path, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().readDir(path, handler));
     }
 
     /**
@@ -326,7 +327,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<List<String>> readDir(String path, String filter) {
-        return toPromise(handler -> vertx.fileSystem().readDir(path, filter, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().readDir(path, filter, handler));
     }
 
     /**
@@ -339,7 +340,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Buffer> readFile(String path) {
-        return toPromise(handler -> vertx.fileSystem().readFile(path, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().readFile(path, handler));
     }
 
     /**
@@ -352,7 +353,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> writeFile(String path, Buffer data) {
-        return toPromise(handler -> vertx.fileSystem().writeFile(path, data, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().writeFile(path, data, handler));
     }
 
     /**
@@ -366,7 +367,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<AsyncFile> open(String path, OpenOptions options) {
-        return toPromise(handler -> vertx.fileSystem().open(path, options, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().open(path, options, handler));
     }
 
     /**
@@ -377,7 +378,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> createFile(String path) {
-        return toPromise(handler -> vertx.fileSystem().createFile(path, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().createFile(path, handler));
     }
 
     /**
@@ -389,7 +390,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Void> createFile(String path, String perms) {
-        return toPromise(handler -> vertx.fileSystem().createFile(path, perms, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().createFile(path, perms, handler));
     }
 
     /**
@@ -400,7 +401,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<Boolean> exists(String path) {
-        return toPromise(handler -> vertx.fileSystem().exists(path, handler));
+        return adapter.toPromise(handler -> vertx.fileSystem().exists(path, handler));
     }
 
     /**
@@ -411,23 +412,7 @@ public class DefaultWhenFileSystem implements WhenFileSystem {
      */
     @Override
     public Promise<FileSystemProps> fsProps(String path) {
-        return toPromise(handler -> vertx.fileSystem().fsProps(path, handler));
-    }
-
-    private <T> Promise<T> toPromise(Consumer<Handler<AsyncResult<T>>> consumer) {
-
-        Deferred<T> d = when.defer();
-
-        consumer.accept(result -> {
-            if (result.succeeded()) {
-                d.resolve(result.result());
-            } else {
-                d.reject(result.cause());
-            }
-        });
-
-        return d.getPromise();
-
+        return adapter.toPromise(handler -> vertx.fileSystem().fsProps(path, handler));
     }
 
 }

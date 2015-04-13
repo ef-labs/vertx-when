@@ -2,7 +2,7 @@
 
 # vertx-when
 
-Provides when.java wrappers for standard vert.x 3 objects to return promises.
+Provides [when.java](https://github.com/englishtown/when.java) wrappers for standard vert.x 3 objects to return promises.
 
 ## Getting Started
 
@@ -133,8 +133,8 @@ when.all(promises).then(
 
 List<Promise<HttpClientResponse>> promises = new ArrayList<>();
 
-promises.add(whenHttpClient.request(HttpMethod.GET, "http://test.englishtown.com/test1", new RequestOptions()));
-promises.add(whenHttpClient.request(HttpMethod.POST, "http://test.englishtown.com/test2", new RequestOptions()));
+promises.add(whenHttpClient.requestAbs(HttpMethod.GET, "http://test.englishtown.com/test1", new RequestOptions()));
+promises.add(whenHttpClient.requestAbs(HttpMethod.POST, "http://test.englishtown.com/test2", new RequestOptions()));
 
 when.all(promises).then(
         responses -> {
@@ -154,16 +154,18 @@ when.all(promises).then(
 ```java
 
 RequestOptions options = new RequestOptions().setPauseResponse(true);
-whenHttpClient.requestResponseBody(HttpMethod.GET, "http://localhost:8081/test", options).then(
-    result -> {
-        HttpClientResponse response = result.getResponse();
-        Buffer body = result.getBody();
-    },
-    value -> {
+whenHttpClient.requestAbs(HttpMethod.GET, "http://localhost:8081/test", options)
+    .then(response -> {
+        return whenHttpClient.body(response);
+    })
+    .then(body -> {
+        // Do something with the body
+        return null;
+    })
+    .otherwise(t ->
         // On fail
         return null;
-    }
-);
+    });
 
 ```
 
