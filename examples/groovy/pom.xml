@@ -9,7 +9,7 @@
     <parent>
         <artifactId>vertx-when-examples</artifactId>
         <groupId>com.englishtown.vertx</groupId>
-        <version>4.0.0-RC3</version>
+        <version>4.0.0-RC4</version>
     </parent>
 
     <properties>
