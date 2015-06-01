@@ -22,10 +22,10 @@
 
     <properties>
         <!--Dependency versions-->
-        <vertx.version>3.0.0-milestone5</vertx.version>
+        <vertx.version>3.0.0-milestone6</vertx.version>
         <when.java.version>3.1.0</when.java.version>
-        <vertx.hk2.version>2.0.0-RC4</vertx.hk2.version>
-        <vertx.guice.version>2.0.0-RC4</vertx.guice.version>
+        <vertx.hk2.version>2.0.0-RC5</vertx.hk2.version>
+        <vertx.guice.version>2.0.0-RC5</vertx.guice.version>
     </properties>
 
     <distributionManagement>
