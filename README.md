@@ -12,7 +12,7 @@ Add a dependency to vertx-when
 <dependency>
     <groupId>com.englishtown.vertx</groupId>
     <artifactId>vertx-when</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.0</version>
 </dependency>
 ```
 
