@@ -22,6 +22,7 @@
 
     <properties>
         <!--Dependency versions-->
+        <vertx.version>3.2.1</vertx.version>
         <when.java.version>3.1.0</when.java.version>
         <vertx.hk2.version>2.1.0</vertx.hk2.version>
         <vertx.guice.version>2.1.0</vertx.guice.version>
