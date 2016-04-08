@@ -5,7 +5,7 @@
     <parent>
         <artifactId>vertx-when-parent</artifactId>
         <groupId>com.englishtown.vertx</groupId>
-        <version>4.1.0</version>
+        <version>4.1.1</version>
     </parent>
 
     <artifactId>vertx-when</artifactId>

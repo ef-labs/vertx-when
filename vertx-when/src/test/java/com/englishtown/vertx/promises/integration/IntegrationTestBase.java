@@ -149,4 +149,54 @@ public abstract class IntegrationTestBase extends VertxTestBase {
         await();
     }
 
+    @Test
+    public void testExecuteBlocking() throws Exception {
+
+        String expected = "expected";
+
+        whenVertx
+                .<String>executeBlocking(future -> {
+                    assertTrue(Thread.currentThread().getName().startsWith("vert.x-worker-"));
+                    future.complete(expected);
+                })
+                .then(s -> {
+                    assertTrue(Thread.currentThread().getName().startsWith("vert.x-eventloop-"));
+                    assertEquals(expected, s);
+                    testComplete();
+                    return null;
+                })
+                .otherwise(this::onRejected);
+
+        await();
+
+    }
+
+    @Test
+    public void testExecuteBlocking_Fail() throws Exception {
+
+        RuntimeException expected = new RuntimeException();
+
+        whenVertx
+                .<String>executeBlocking(
+                        future -> {
+                            assertTrue(Thread.currentThread().getName().startsWith("vert.x-worker-"));
+                            future.fail(expected);
+                        })
+                .then(
+                        s -> {
+                            fail("Expected rejected promise");
+                            return null;
+                        },
+                        t -> {
+                            assertTrue(Thread.currentThread().getName().startsWith("vert.x-eventloop-"));
+                            assertEquals(expected, t);
+                            testComplete();
+                            return null;
+                        })
+                .otherwise(this::onRejected);
+
+        await();
+
+    }
+
 }

@@ -4,9 +4,7 @@ import com.englishtown.promises.Promise;
 import com.englishtown.promises.When;
 import com.englishtown.vertx.promises.PromiseAdapter;
 import com.englishtown.vertx.promises.WhenVertx;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Verticle;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 
 import javax.inject.Inject;
 
@@ -83,6 +81,28 @@ public class DefaultWhenVertx implements WhenVertx {
     @Override
     public Promise<Void> undeploy(String deploymentID) {
         return adapter.toPromise(handler -> vertx.undeploy(deploymentID, handler));
+    }
+
+    /**
+     * Safely execute some blocking code.
+     * <p>
+     * Executes the blocking code in the handler {@code blockingCodeHandler} using a thread from the worker pool.
+     * <p>
+     * When the code is complete the promise will resolve with the result on the original context
+     * (e.g. on the original event loop of the caller).
+     * <p>
+     * A {@code Future} instance is passed into {@code blockingCodeHandler}. When the blocking code successfully completes,
+     * the handler should call the {@link Future#complete} or {@link Future#complete(Object)} method, or the {@link Future#fail}
+     * method if it failed.
+     *
+     * @param blockingCodeHandler handler representing the blocking code to run
+     * @param ordered             if true then if executeBlocking is called several times on the same context, the executions
+     *                            for that context will be executed serially, not in parallel. if false then they will be no ordering
+     *                            guarantees
+     */
+    @Override
+    public <T> Promise<T> executeBlocking(Handler<Future<T>> blockingCodeHandler, boolean ordered) {
+        return adapter.toPromise(handler -> vertx.executeBlocking(blockingCodeHandler, ordered, handler));
     }
 
 }
