@@ -1,8 +1,9 @@
-[![Build Status](https://travis-ci.org/ef-labs/vertx-when.png)](https://travis-ci.org/ef-labs/vertx-when)
-
 # vertx-when
 
 Provides [when.java](https://github.com/ef-labs/when.java) wrappers for standard vert.x 3 objects to return promises.
+
+[![Build Status](http://img.shields.io/travis/ef-labs/vertx-when.svg?maxAge=2592000&style=flat-square)](https://travis-ci.org/ef-labs/vertx-when)
+[![Maven Central](https://img.shields.io/maven-central/v/com.englishtown.vertx/vertx-when.svg?maxAge=2592000&style=flat-square)](https://maven-badges.herokuapp.com/maven-central/com.englishtown.vertx/vertx-when/)
 
 ## Getting Started
 
