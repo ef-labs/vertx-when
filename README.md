@@ -1,8 +1,8 @@
-[![Build Status](https://travis-ci.org/englishtown/vertx-when.png)](https://travis-ci.org/englishtown/vertx-when)
+[![Build Status](https://travis-ci.org/ef-labs/vertx-when.png)](https://travis-ci.org/ef-labs/vertx-when)
 
 # vertx-when
 
-Provides [when.java](https://github.com/englishtown/when.java) wrappers for standard vert.x 3 objects to return promises.
+Provides [when.java](https://github.com/ef-labs/when.java) wrappers for standard vert.x 3 objects to return promises.
 
 ## Getting Started
 
