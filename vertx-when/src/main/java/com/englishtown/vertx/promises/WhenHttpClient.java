@@ -75,6 +75,69 @@ public interface WhenHttpClient {
     Promise<HttpClientResponse> request(HttpMethod method, String requestURI, RequestOptions options);
 
     /**
+     * Create an HTTP request to send to the server at the specified host and port and return the
+     *
+     * @param method     the HTTP method
+     * @param port       the port
+     * @param host       the host
+     * @param requestURI the relative URI
+     * @return a promise for the HTTP client response object
+     */
+    Promise<HttpClientResponseAndBody> requestAndReadBody(HttpMethod method, int port, String host, String requestURI);
+
+    /**
+     * Create an HTTP request to send to the server at the specified host and port
+     *
+     * @param method     the HTTP method
+     * @param port       the port
+     * @param host       the host
+     * @param requestURI the relative URI
+     * @param options    the additional request options
+     * @return a promise for the HTTP client response object
+     */
+    Promise<HttpClientResponseAndBody> requestAndReadBody(HttpMethod method, int port, String host, String requestURI, RequestOptions options);
+
+    /**
+     * Create an HTTP request to send to the server at the specified host and default port
+     *
+     * @param method     the HTTP method
+     * @param host       the host
+     * @param requestURI the relative URI
+     * @return a promise for the HTTP client response object
+     */
+    Promise<HttpClientResponseAndBody> requestAndReadBody(HttpMethod method, String host, String requestURI);
+
+    /**
+     * Create an HTTP request to send to the server at the specified host and default port
+     *
+     * @param method     the HTTP method
+     * @param host       the host
+     * @param requestURI the relative URI
+     * @param options    the additional request options
+     * @return a promise for the HTTP client response object
+     */
+    Promise<HttpClientResponseAndBody> requestAndReadBody(HttpMethod method, String host, String requestURI, RequestOptions options);
+
+    /**
+     * Create an HTTP request to send to the server at the default host and port.
+     *
+     * @param method     the HTTP method
+     * @param requestURI the relative URI
+     * @return a promise for the HTTP client response object
+     */
+    Promise<HttpClientResponseAndBody> requestAndReadBody(HttpMethod method, String requestURI);
+
+    /**
+     * Create an HTTP request to send to the server at the default host and port.
+     *
+     * @param method     the HTTP method
+     * @param requestURI the relative URI
+     * @param options    the additional request options
+     * @return a promise for the HTTP client response object
+     */
+    Promise<HttpClientResponseAndBody> requestAndReadBody(HttpMethod method, String requestURI, RequestOptions options);
+
+    /**
      * Create an HTTP request to send to the server using an absolute URI
      * the response
      *
@@ -94,6 +157,27 @@ public interface WhenHttpClient {
      * @return a promise for the HTTP client response object
      */
     Promise<HttpClientResponse> requestAbs(HttpMethod method, String absoluteURI, RequestOptions options);
+
+    /**
+     * Create an HTTP request to send to the server using an absolute URI
+     * the response
+     *
+     * @param method      the HTTP method
+     * @param absoluteURI the absolute URI
+     * @return a promise for the HTTP client response object
+     */
+    Promise<HttpClientResponseAndBody> requestAbsAndReadBody(HttpMethod method, String absoluteURI);
+
+    /**
+     * Create an HTTP request to send to the server using an absolute URI
+     * the response
+     *
+     * @param method      the HTTP method
+     * @param absoluteURI the absolute URI
+     * @param options     the additional request options
+     * @return a promise for the HTTP client response object
+     */
+    Promise<HttpClientResponseAndBody> requestAbsAndReadBody(HttpMethod method, String absoluteURI, RequestOptions options);
 
     /**
      * Takes a {@link io.vertx.core.http.HttpClientResponse} and returns a promise for the body.
