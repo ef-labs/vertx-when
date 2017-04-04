@@ -1,9 +1,7 @@
 package com.englishtown.vertx.promises.impl;
 
-import com.englishtown.promises.Done;
-import com.englishtown.promises.Promise;
-import com.englishtown.promises.When;
-import com.englishtown.promises.WhenFactory;
+import com.englishtown.promises.*;
+import com.englishtown.vertx.promises.HttpClientResponseAndBody;
 import com.englishtown.vertx.promises.RequestOptions;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
@@ -15,7 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -41,6 +38,7 @@ public class DefaultWhenHttpClientTest {
     private int port = 8080;
     private String requestURI = "/path?a=b";
     private String absoluteURI = "http://test.org/path?a=b";
+    private Buffer body = Buffer.buffer();
 
     @Mock
     private Vertx vertx;
@@ -59,7 +57,9 @@ public class DefaultWhenHttpClientTest {
     @Captor
     private ArgumentCaptor<Handler<HttpClientResponse>> responseHandlerCaptor;
     @Captor
-    private ArgumentCaptor<Handler<Buffer>> bufferHandlerCaptor;
+    private ArgumentCaptor<Handler<Buffer>> bodyHandlerCaptor;
+    @Captor
+    private ArgumentCaptor<Handler<Void>> endHandlerCaptor;
 
     @Before
     public void setUp() throws Exception {
@@ -68,48 +68,68 @@ public class DefaultWhenHttpClientTest {
 
         when(vertx.createHttpClient()).thenReturn(client);
         when(vertx.createHttpClient(any())).thenReturn(client);
-        when(client.request(any(), anyInt(), anyString(), anyString(), Matchers.<Handler<HttpClientResponse>>any())).thenReturn(request);
-        when(client.request(any(), anyString(), anyString(), Matchers.<Handler<HttpClientResponse>>any())).thenReturn(request);
-        when(client.request(any(), anyString(), Matchers.<Handler<HttpClientResponse>>any())).thenReturn(request);
-        when(client.requestAbs(any(), anyString(), Matchers.<Handler<HttpClientResponse>>any())).thenReturn(request);
+        when(client.request(any(), anyInt(), anyString(), anyString())).thenReturn(request);
+        when(client.request(any(), anyString(), anyString())).thenReturn(request);
+        when(client.request(any(), anyString())).thenReturn(request);
+        when(client.requestAbs(any(), anyString())).thenReturn(request);
+        when(request.handler(any())).thenReturn(request);
         when(request.exceptionHandler(any())).thenReturn(request);
         when(request.headers()).thenReturn(headers);
         whenHttpClient = new DefaultWhenHttpClient(vertx, when);
     }
 
+    private void verifyResponse(Promise<HttpClientResponse> p) throws Exception {
+
+        State<HttpClientResponse> state = p.inspect();
+        assertEquals(HandlerState.PENDING, state.getState());
+
+        verify(request).end();
+        verify(request).handler(responseHandlerCaptor.capture());
+
+        responseHandlerCaptor.getValue().handle(response);
+
+        state = p.inspect();
+        assertEquals(HandlerState.FULFILLED, state.getState());
+
+        verify(response).endHandler(endHandlerCaptor.capture());
+        endHandlerCaptor.getValue().handle(null);
+        verify(client).close();
+
+    }
+
     @Test
     public void testRequest1() throws Exception {
 
-        whenHttpClient.request(HttpMethod.POST, port, host, requestURI);
-        verify(client).request(eq(HttpMethod.POST), eq(port), eq(host), eq(requestURI), any());
-        verify(request).end();
+        Promise<HttpClientResponse> p = whenHttpClient.request(HttpMethod.POST, port, host, requestURI);
+        verify(client).request(eq(HttpMethod.POST), eq(port), eq(host), eq(requestURI));
+        verifyResponse(p);
 
     }
 
     @Test
     public void testRequest2() throws Exception {
 
-        whenHttpClient.request(HttpMethod.POST, host, requestURI);
-        verify(client).request(eq(HttpMethod.POST), eq(host), eq(requestURI), any());
-        verify(request).end();
+        Promise<HttpClientResponse> p = whenHttpClient.request(HttpMethod.POST, host, requestURI);
+        verify(client).request(eq(HttpMethod.POST), eq(host), eq(requestURI));
+        verifyResponse(p);
 
     }
 
     @Test
     public void testRequest3() throws Exception {
 
-        whenHttpClient.request(HttpMethod.POST, requestURI);
-        verify(client).request(eq(HttpMethod.POST), eq(requestURI), Matchers.<Handler<HttpClientResponse>>any());
-        verify(request).end();
+        Promise<HttpClientResponse> p = whenHttpClient.request(HttpMethod.POST, requestURI);
+        verify(client).request(eq(HttpMethod.POST), eq(requestURI));
+        verifyResponse(p);
 
     }
 
     @Test
     public void testRequestAbs() throws Exception {
 
-        whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI);
-        verify(client).requestAbs(eq(HttpMethod.GET), eq(absoluteURI), any());
-        verify(request).end();
+        Promise<HttpClientResponse> p = whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI);
+        verify(client).requestAbs(eq(HttpMethod.GET), eq(absoluteURI));
+        verifyResponse(p);
 
     }
 
@@ -117,11 +137,11 @@ public class DefaultWhenHttpClientTest {
     public void testRequestAbs_Client() throws Exception {
 
         HttpClient otherClient = mock(HttpClient.class);
-        when(otherClient.requestAbs(any(), anyString(), any())).thenReturn(request);
+        when(otherClient.requestAbs(any(), anyString())).thenReturn(request);
         RequestOptions options = new RequestOptions().setClient(otherClient);
 
         whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI, options);
-        verify(otherClient).requestAbs(any(), anyString(), any());
+        verify(otherClient).requestAbs(any(), anyString());
         verify(request).end();
 
     }
@@ -226,7 +246,8 @@ public class DefaultWhenHttpClientTest {
         RequestOptions options = new RequestOptions().setPauseResponse(true);
 
         whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI, options);
-        verify(client).requestAbs(any(), any(), responseHandlerCaptor.capture());
+        verify(client).requestAbs(any(), any());
+        verify(request).handler(responseHandlerCaptor.capture());
         verify(request).end();
 
         responseHandlerCaptor.getValue().handle(response);
@@ -256,10 +277,77 @@ public class DefaultWhenHttpClientTest {
 
         whenHttpClient.body(response).then(done.onFulfilled, done.onRejected);
         verify(response).resume();
-        verify(response).bodyHandler(bufferHandlerCaptor.capture());
-        bufferHandlerCaptor.getValue().handle(Buffer.buffer());
+        verify(response).bodyHandler(bodyHandlerCaptor.capture());
+        bodyHandlerCaptor.getValue().handle(body);
 
         done.assertFulfilled();
+
+    }
+
+    private void verifyResponseAndBody(Promise<HttpClientResponseAndBody> p) throws Exception {
+
+        State<HttpClientResponseAndBody> state = p.inspect();
+        assertEquals(HandlerState.PENDING, state.getState());
+
+        verify(request).end();
+        verify(request).handler(responseHandlerCaptor.capture());
+
+        responseHandlerCaptor.getValue().handle(response);
+        verify(response).bodyHandler(bodyHandlerCaptor.capture());
+
+        bodyHandlerCaptor.getValue().handle(body);
+        verify(client).close();
+
+        state = p.inspect();
+        assertEquals(HandlerState.FULFILLED, state.getState());
+        HttpClientResponseAndBody responseAndBody = state.getValue();
+
+        assertEquals(response, responseAndBody.getResponse());
+        assertEquals(body, responseAndBody.getBody());
+
+    }
+
+    @Test
+    public void testRequestAndReadBody1() throws Exception {
+
+        Promise<HttpClientResponseAndBody> p = whenHttpClient.requestAndReadBody(HttpMethod.GET, port, host, requestURI);
+        verify(client).request(any(), eq(port), eq(host), eq(requestURI));
+        verifyResponseAndBody(p);
+
+    }
+
+    @Test
+    public void testRequestAndReadBody2() throws Exception {
+
+        Promise<HttpClientResponseAndBody> p = whenHttpClient.requestAndReadBody(HttpMethod.GET, host, requestURI);
+        verify(client).request(any(), eq(host), eq(requestURI));
+        verifyResponseAndBody(p);
+
+    }
+
+    @Test
+    public void testRequestAndReadBody3() throws Exception {
+
+        Promise<HttpClientResponseAndBody> p = whenHttpClient.requestAndReadBody(HttpMethod.GET, requestURI);
+        verify(client).request(any(), eq(requestURI));
+        verifyResponseAndBody(p);
+
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testRequestAndReadBody_Pause_Fail() throws Exception {
+
+        RequestOptions options = new RequestOptions().setPauseResponse(true);
+        whenHttpClient.requestAndReadBody(HttpMethod.GET, requestURI, options);
+
+    }
+
+    @Test
+    public void testRequestAbsAndReadBody() throws Exception {
+
+        Promise<HttpClientResponseAndBody> p = whenHttpClient.requestAbsAndReadBody(HttpMethod.GET, absoluteURI);
+        verify(client).requestAbs(any(), eq(absoluteURI));
+        verifyResponseAndBody(p);
 
     }
 

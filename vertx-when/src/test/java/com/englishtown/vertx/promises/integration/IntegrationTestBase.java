@@ -4,6 +4,7 @@ import com.englishtown.promises.Promise;
 import com.englishtown.promises.When;
 import com.englishtown.vertx.promises.*;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.test.core.VertxTestBase;
@@ -99,6 +100,34 @@ public abstract class IntegrationTestBase extends VertxTestBase {
                     return whenHttpClient.body(response);
                 })
                 .then(body -> {
+                    assertNotNull(body);
+                    JsonObject json = new JsonObject(body.toString());
+                    assertNotNull(json);
+
+                    testComplete();
+                    return null;
+                })
+                .otherwise(this::onRejected);
+
+        await();
+    }
+
+    @Test
+    public void testHttpRequestResponseAndReadBody() {
+
+        whenVertx.deployVerticle(HttpServerVerticle.class.getName())
+                .then(deploymentID -> {
+                    RequestOptions options = new RequestOptions();
+                    return whenHttpClient.requestAbsAndReadBody(HttpMethod.GET, "http://localhost:8081/test", options);
+                })
+                .then(responseAndBody -> {
+                    assertNotNull(responseAndBody);
+
+                    HttpClientResponse response = responseAndBody.getResponse();
+                    assertNotNull(response);
+                    assertEquals(200, response.statusCode());
+
+                    Buffer body = responseAndBody.getBody();
                     assertNotNull(body);
                     JsonObject json = new JsonObject(body.toString());
                     assertNotNull(json);

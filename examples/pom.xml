@@ -9,7 +9,7 @@
     <parent>
         <artifactId>vertx-when-parent</artifactId>
         <groupId>com.englishtown.vertx</groupId>
-        <version>4.2.0</version>
+        <version>4.3.0</version>
     </parent>
 
     <modules>
