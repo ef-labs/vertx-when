@@ -98,14 +98,15 @@ public class RequestOptions {
      */
     @Deprecated
     public Map<String, String> getHeaders() {
-        Map<String, String> headerMap = new HashMap<>();
         if (this.headers == null) {
-            return headerMap;
+            return null;
         }
-        this.headers.entries()
-                .forEach(entry -> headerMap.putIfAbsent(entry.getKey(), entry.getValue()));
 
-        return headerMap;
+        Map<String, String> map = new HashMap<>();
+        this.headers.entries()
+                .forEach(entry -> map.putIfAbsent(entry.getKey(), entry.getValue()));
+
+        return map;
     }
 
     public RequestOptions setChunked(boolean chunked) {

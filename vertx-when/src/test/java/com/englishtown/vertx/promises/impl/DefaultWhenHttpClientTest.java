@@ -53,7 +53,7 @@ public class DefaultWhenHttpClientTest {
     @Captor
     private ArgumentCaptor<Buffer> bufferCaptor;
     @Captor
-    private ArgumentCaptor<Map<String, String>> headersCaptor;
+    private ArgumentCaptor<MultiMap> headersCaptor;
     @Captor
     private ArgumentCaptor<Handler<HttpClientResponse>> responseHandlerCaptor;
     @Captor
@@ -198,7 +198,7 @@ public class DefaultWhenHttpClientTest {
     @Test
     public void testRequestAbs_Headers() throws Exception {
 
-        Map<String, String> headers2 = new HashMap<>();
+        MultiMap headers2 = new CaseInsensitiveHeaders();
         RequestOptions options = new RequestOptions().setHeaders(headers2);
 
         whenHttpClient.requestAbs(HttpMethod.GET, absoluteURI, options);
