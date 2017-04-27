@@ -207,7 +207,7 @@ public class DefaultWhenHttpClient implements WhenHttpClient {
             request.setChunked(true);
         }
         if (options.getHeaders() != null) {
-            request.headers().addAll(options.getHeaders());
+            request.headers().addAll(options.getMultiMapHeaders());
         }
         if (options.getTimeout() > 0) {
             request.setTimeout(options.getTimeout());
