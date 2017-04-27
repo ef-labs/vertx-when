@@ -1,7 +1,9 @@
 package com.englishtown.vertx.promises;
 
 import com.englishtown.promises.Promise;
+import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.CaseInsensitiveHeaders;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientRequest;
@@ -18,7 +20,7 @@ public class RequestOptions {
     private HttpClient client;
     private HttpClientOptions clientOptions;
     private Buffer data;
-    private Map<String, String> headers;
+    private MultiMap headers;
     private boolean chunked;
     private long timeoutMs = -1;
     private int writeQueueMaxSize = -1;
@@ -66,19 +68,44 @@ public class RequestOptions {
      */
     public RequestOptions addHeader(String name, String value) {
         if (headers == null) {
-            headers = new HashMap<>();
+            headers = new CaseInsensitiveHeaders();
         }
-        headers.put(name, value);
+        headers.add(name, value);
         return this;
     }
 
+
+    /**
+     * @deprecated: Use the {@link #setHeaders} overload using a {@link MultiMap} instead.
+     */
+    @Deprecated
     public RequestOptions setHeaders(Map<String, String> headers) {
+        headers.forEach((k, v) -> this.headers.add(k, v));
+        return this;
+    }
+
+    public RequestOptions setHeaders(MultiMap headers) {
         this.headers = headers;
         return this;
     }
 
-    public Map<String, String> getHeaders() {
+    public MultiMap getMultiMapHeaders() {
         return this.headers;
+    }
+
+    /**
+     * @deprecated: Use {@link #getMultiMapHeaders} instead.
+     */
+    @Deprecated
+    public Map<String, String> getHeaders() {
+        Map<String, String> headerMap = new HashMap<>();
+        if (this.headers == null) {
+            return headerMap;
+        }
+        this.headers.entries()
+                .forEach(entry -> headerMap.putIfAbsent(entry.getKey(), entry.getValue()));
+
+        return headerMap;
     }
 
     public RequestOptions setChunked(boolean chunked) {
